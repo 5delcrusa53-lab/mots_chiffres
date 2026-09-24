@@ -1,0 +1,19 @@
+{
+  "name": "Mon petit cartable",
+  "short_name": "Cartable",
+  "description": "Apprendre à lire et à compter en jouant, de 5 à 9 ans.",
+  "lang": "fr",
+  "dir": "ltr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#F5F7FE",
+  "theme_color": "#F5F7FE",
+  "categories": ["education", "kids"],
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
