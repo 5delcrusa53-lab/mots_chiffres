@@ -1,0 +1,1658 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mon petit cartable</title>
+<style>
+:root{
+  --mx:18px;
+  --paper:#F5F7FE; --line:#E4E9F8; --line2:#C9D3F1; --margin:#EE8A80;
+  --ink:#1D2757; --ink-soft:#5A6494; --card:#FFFFFF; --edge:#C6CEEA;
+  --red:#D6342F; --red-edge:#9E1F1B; --blue:#1C5BD0; --blue-edge:#123E91;
+  --green:#178A55; --green-edge:#0D5E39; --sun:#FFC43D; --sun-edge:#D69A00; --sun-ink:#553600;
+  --bad:#D93A2F; --hint-bg:#FFF4C7; --hint-ink:#553600; --ok-bg:#E2F5EA; --ok-ink:#0D5E39;
+  --font-ui: ui-rounded, "SF Pro Rounded", "Nunito", "Varela Round", "Segoe UI", Roboto, system-ui, -apple-system, sans-serif;
+  --font-read: "Andika", "Comic Neue", ui-rounded, "SF Pro Rounded", "Segoe UI", Roboto, system-ui, sans-serif;
+  color-scheme: light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#131A36; --line:#1B2349; --line2:#27316A; --margin:#7E3440;
+    --ink:#EAF0FF; --ink-soft:#A3AED8; --card:#1C2550; --edge:#34407A;
+    --red:#FF7D70; --red-edge:#B8453B; --blue:#7FB1FF; --blue-edge:#3E6FC4;
+    --green:#3FCB88; --green-edge:#1D7F52; --sun:#FFC94D; --sun-edge:#B88400; --sun-ink:#2E1F00;
+    --bad:#FF6B5E; --hint-bg:#3A300F; --hint-ink:#FFE9A8; --ok-bg:#12382A; --ok-ink:#9BF0C6;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#131A36; --line:#1B2349; --line2:#27316A; --margin:#7E3440;
+  --ink:#EAF0FF; --ink-soft:#A3AED8; --card:#1C2550; --edge:#34407A;
+  --red:#FF7D70; --red-edge:#B8453B; --blue:#7FB1FF; --blue-edge:#3E6FC4;
+  --green:#3FCB88; --green-edge:#1D7F52; --sun:#FFC94D; --sun-edge:#B88400; --sun-ink:#2E1F00;
+  --bad:#FF6B5E; --hint-bg:#3A300F; --hint-ink:#FFE9A8; --ok-bg:#12382A; --ok-ink:#9BF0C6;
+  color-scheme: dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{
+  height:100%;
+  scroll-padding-top:env(safe-area-inset-top,0px);
+  background-color:var(--paper);
+  background-image:
+    linear-gradient(to right, transparent var(--mx), var(--margin) var(--mx), var(--margin) calc(var(--mx) + 2px), transparent calc(var(--mx) + 2px)),
+    repeating-linear-gradient(to bottom, transparent 0 39px, var(--line2) 39px 40px),
+    repeating-linear-gradient(to bottom, transparent 0 9px, var(--line) 9px 10px),
+    repeating-linear-gradient(to right, transparent 0 39px, var(--line) 39px 40px);
+}
+body{margin:0; height:100%; font-family:var(--font-ui); color:var(--ink); -webkit-tap-highlight-color:transparent; -webkit-text-size-adjust:100%;}
+#app{min-height:100%}
+.view{min-height:100%; display:flex; flex-direction:column; max-width:760px; margin:0 auto; padding:14px 14px 16px calc(var(--mx) + 16px)}
+.view[hidden]{display:none !important}
+.read{font-family:var(--font-read)}
+.s-r{color:var(--red)} .s-b{color:var(--blue)}
+button{font:inherit; color:inherit; cursor:pointer; -webkit-user-select:none; user-select:none; touch-action:manipulation}
+button:focus-visible, input:focus-visible{outline:3px solid var(--blue); outline-offset:3px}
+.key{border:2px solid var(--edge); background:var(--card); border-radius:18px; box-shadow:0 4px 0 var(--edge); padding:12px 16px; font-weight:800; transition:transform .08s, box-shadow .08s, opacity .2s}
+.key:active:not(:disabled){transform:translateY(3px); box-shadow:0 1px 0 var(--edge)}
+.key:disabled{cursor:default}
+
+/* ---------- Accueil ---------- */
+.top{display:flex; align-items:center; justify-content:space-between; gap:10px}
+.brand{font-weight:900; font-size:clamp(27px,7.6vw,42px); line-height:1.05; margin:4px 0 0; letter-spacing:-.01em; cursor:pointer}
+.brand span{display:inline-block}
+.top-right{display:flex; gap:8px; align-items:center; flex:none}
+.stars-pill{background:var(--sun); border-color:var(--sun-edge); box-shadow:0 4px 0 var(--sun-edge); color:var(--sun-ink); border-radius:999px; padding:8px 14px; font-size:20px}
+.icon-btn{width:48px; height:48px; border-radius:50%; padding:0; font-size:22px}
+.hello{font-size:20px; font-weight:800; margin:14px 0 12px; cursor:pointer}
+.ages{display:flex; gap:8px; flex-wrap:wrap; align-items:center}
+.lbl{font-weight:800; color:var(--ink-soft); font-size:15px; margin-right:2px}
+.age{min-width:62px; min-height:48px; border-radius:24px; font-size:17px; padding:8px 12px}
+.age[aria-checked="true"]{background:var(--ink); color:var(--paper); border-color:var(--ink); box-shadow:0 4px 0 var(--ink-soft)}
+.subjects{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:18px}
+.subj{min-height:74px; font-size:23px; font-weight:900; display:flex; align-items:center; justify-content:center; gap:10px; border-radius:22px}
+.subj .g{font-family:var(--font-read); font-size:26px}
+.subj[aria-pressed="true"][data-subj="lire"]{background:var(--red); color:#fff; border-color:var(--red-edge); box-shadow:0 5px 0 var(--red-edge)}
+.subj[aria-pressed="true"][data-subj="compter"]{background:var(--blue); color:#fff; border-color:var(--blue-edge); box-shadow:0 5px 0 var(--blue-edge)}
+.grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:12px; margin-top:16px}
+.tile{text-align:left; display:flex; flex-direction:column; gap:4px; padding:14px 14px 12px; border-radius:20px; min-height:156px; border-left:6px solid var(--c)}
+.tile-ico{font-size:32px; font-weight:800; color:var(--c); line-height:1.15; min-height:42px; white-space:nowrap}
+.tile-t{font-weight:900; font-size:18px; line-height:1.15}
+.tile-d{font-size:13.5px; color:var(--ink-soft); font-weight:700; line-height:1.3}
+.tile-s{margin-top:auto; color:var(--sun-edge); letter-spacing:2px; font-size:17px; min-height:20px}
+.tile-s .off{color:var(--line2)}
+.dots i{display:inline-block; width:.5em; height:.5em; border-radius:50%; background:var(--sun); margin-right:.1em; box-shadow:inset 0 -3px 0 rgba(0,0,0,.15); vertical-align:middle}
+.tip{color:var(--ink-soft); font-weight:700; font-size:14.5px; line-height:1.45; margin:18px 0 0}
+
+/* ---------- Jeu ---------- */
+.g-top{display:flex; align-items:center; gap:12px}
+.back{width:50px; height:50px; border-radius:50%; font-size:30px; line-height:1; padding:0 0 4px; flex:none}
+.g-title{font-weight:900; font-size:21px; flex:1; margin:0}
+.beads{display:flex; justify-content:space-between; position:relative; margin:16px 6px 4px}
+.beads::before{content:""; position:absolute; left:6px; right:6px; top:50%; height:3px; margin-top:-1.5px; background:var(--edge); border-radius:2px}
+.bead{position:relative; width:18px; height:18px; border-radius:50%; background:var(--card); border:3px solid var(--edge); transition:transform .25s}
+.bead.cur{border-color:var(--ink); transform:scale(1.3)}
+.bead.star{background:var(--sun); border-color:var(--sun-edge)}
+.bead.ok{background:var(--green); border-color:var(--green-edge)}
+.bead.miss{background:var(--line2); border-color:var(--ink-soft)}
+.consigne{display:flex; align-items:center; gap:12px; margin:12px 0 4px}
+.spk{flex:none; width:54px; height:54px; border-radius:50%; font-size:24px; padding:0}
+#consigne{margin:0; font-size:19px; font-weight:800; line-height:1.3}
+.stage{flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:18px; padding:12px 0 18px}
+.opts{display:flex; flex-wrap:wrap; justify-content:center; gap:12px; width:100%}
+.opt{min-width:86px; min-height:84px; font-size:34px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px}
+.opts.letters .opt{font-size:54px; width:96px; height:104px; font-weight:700}
+.opts.syls .opt{font-size:36px; min-width:100px; font-weight:700}
+.opts.words .opt{font-size:28px; flex:1 1 40%; max-width:330px; font-weight:700}
+.opts.nums .opt{font-size:38px; min-width:96px; font-variant-numeric:tabular-nums}
+.opts.counts .opt{min-width:72px; padding:10px}
+.opts.counts .num{font-size:34px; line-height:1}
+.claps{display:flex; gap:4px} .claps i{width:10px; height:10px; border-radius:50%; background:var(--ink-soft)}
+.opts.col{flex-direction:column; align-items:stretch; max-width:440px}
+.opts.col .opt{font-size:26px; min-height:66px}
+.opt-wrap{display:flex; gap:8px; align-items:stretch}
+.opt-wrap .opt{flex:1}
+.mini-spk{width:58px; flex:none; font-size:20px; padding:0; border-radius:16px}
+.opt.good, .slot.good{background:var(--green); color:#fff; border-color:var(--green-edge); box-shadow:0 4px 0 var(--green-edge)}
+.opt.good .syl, .slot.good{color:#fff}
+.opt:disabled:not(.good){opacity:.3}
+.shake{animation:shake .42s}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-9px)}40%{transform:translateX(9px)}60%{transform:translateX(-6px)}80%{transform:translateX(6px)}}
+.pop{animation:pop .45s cubic-bezier(.3,1.6,.5,1)}
+@keyframes pop{0%{transform:scale(.6); opacity:0}100%{transform:scale(1); opacity:1}}
+.pulse{animation:pulse .9s ease-in-out 4}
+@keyframes pulse{50%{transform:scale(1.12); box-shadow:0 0 0 7px var(--sun)}}
+.ear{width:118px; height:118px; border-radius:50%; font-size:46px; background:var(--blue); color:#fff; border-color:var(--blue-edge); box-shadow:0 6px 0 var(--blue-edge); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0; padding:0}
+.ear small{font-size:15px; font-weight:900}
+.bigword{font-family:var(--font-read); font-size:clamp(44px,13vw,78px); font-weight:700; padding:8px 22px; border-radius:22px; letter-spacing:.02em; line-height:1.2; text-align:center}
+.syl{display:inline-block; transition:transform .2s, color .2s; border-radius:10px}
+.syl.lit{transform:translateY(-8px) scale(1.1)}
+.syl.gap{min-width:1.6em; border:4px dashed var(--ink-soft); color:var(--ink-soft); text-align:center; margin:0 4px; padding:0 6px}
+.assemble{display:flex; align-items:center; gap:12px; flex-wrap:wrap; justify-content:center; font-size:40px; font-weight:900}
+.ltile{font-size:54px; min-width:92px; min-height:96px; font-weight:700}
+.ltile.cons{color:var(--blue)} .ltile.vow{color:var(--red)}
+.op{color:var(--ink-soft)}
+.qm{font-family:var(--font-read); font-size:54px; min-width:96px; text-align:center; color:var(--ink-soft); border-bottom:5px solid var(--edge)}
+.qm.done{color:var(--green); border-color:var(--green)}
+.frames{display:flex; flex-wrap:wrap; gap:12px; justify-content:center; --b:36px}
+.frame{display:grid; grid-template-columns:repeat(5,var(--b)); gap:calc(var(--b) * .16); padding:calc(var(--b) * .22); border:3px solid var(--ink-soft); border-radius:calc(var(--b) * .4); background:var(--card)}
+.cell{width:var(--b); height:var(--b); border-radius:50%; border:2px dashed var(--line2); padding:0; background:transparent; position:relative}
+.cell.on{border:none; background:radial-gradient(circle at 34% 30%, rgba(255,255,255,.65) 0 16%, transparent 18%), var(--sun); box-shadow:inset 0 -4px 0 rgba(0,0,0,.16)}
+.cell.on.c2{background:radial-gradient(circle at 34% 30%, rgba(255,255,255,.55) 0 16%, transparent 18%), var(--blue)}
+.cell.on.x{opacity:.42}
+.cell.on.x::after{content:"✕"; position:absolute; inset:0; display:grid; place-items:center; color:var(--bad); font-weight:900; font-size:calc(var(--b) * .8); line-height:1}
+.cell.counted{outline:3px solid var(--green); outline-offset:2px}
+.groups{display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-top:8px}
+.slots, .tray{display:flex; flex-wrap:wrap; gap:10px; justify-content:center; width:100%}
+.slot{min-width:76px; min-height:72px; border:3px dashed var(--ink-soft); border-radius:16px; background:transparent; font-family:var(--font-read); font-size:34px; font-weight:700; box-shadow:none; padding:4px 10px}
+.slot.filled{border-style:solid; border-color:var(--edge); background:var(--card); box-shadow:0 4px 0 var(--edge)}
+.slot.wrongl{border-color:var(--bad); color:var(--bad)}
+.slots.letters{gap:6px} .slots.letters .slot{min-width:42px; min-height:58px; font-size:30px; padding:2px 4px; border-radius:12px}
+.stile{font-family:var(--font-read); font-size:32px; min-width:76px; min-height:64px; font-weight:700}
+.tray.letters .stile{min-width:54px; min-height:58px; font-size:30px}
+.stile.used{visibility:hidden}
+.sentence{font-family:var(--font-read); font-size:clamp(25px,7vw,36px); line-height:1.65; text-align:center; font-weight:700; margin:0; max-width:620px}
+.story{font-size:clamp(21px,5.6vw,27px); line-height:1.6; text-align:left}
+.w{cursor:pointer; border-radius:8px; padding:0 2px}
+.w:active, .w.lit{background:var(--hint-bg)}
+.blank{display:inline-block; min-width:3.4em; border-bottom:4px solid var(--blue); color:var(--green); text-align:center}
+.eq{font-size:clamp(38px,11vw,62px); font-weight:900; display:flex; align-items:center; gap:.25em; font-variant-numeric:tabular-nums; flex-wrap:wrap; justify-content:center}
+.eq .unit{font-size:.45em; color:var(--ink-soft)}
+.ansbox{min-width:1.7em; padding:0 .2em; border-bottom:5px solid var(--blue); color:var(--blue); text-align:center; line-height:1.15}
+.ansbox.ok{color:var(--green); border-color:var(--green)}
+.ansbox.bad, .posee.bad .r{color:var(--bad)}
+.posee{display:grid; font-size:clamp(40px,11vw,58px); font-weight:900; font-variant-numeric:tabular-nums; column-gap:6px; line-height:1.15}
+.posee .c{width:.72em; text-align:center}
+.posee .carry{font-size:.42em; color:var(--red); height:1.3em; align-self:end; line-height:1.3}
+.posee .rule{grid-column:1/-1; height:5px; background:var(--ink); border-radius:3px; margin:4px 0 6px}
+.posee .r{color:var(--blue); border-bottom:3px dotted var(--line2); min-height:1.15em}
+.posee.ok .r{color:var(--green)}
+.seq{display:flex; flex-wrap:wrap; gap:6px; justify-content:center; align-items:center}
+.num-c{min-width:62px; height:62px; padding:0 10px; border-radius:31px; border:3px solid var(--ink-soft); background:var(--card); display:grid; place-items:center; font-size:26px; font-weight:900; font-variant-numeric:tabular-nums; cursor:pointer}
+.num-c.blank{border-style:dashed; border-color:var(--blue); color:var(--blue); min-width:74px}
+.num-c.done{border-style:solid; border-color:var(--green); color:var(--green)}
+.jump{font-size:15px; font-weight:900; color:var(--red); min-width:6px}
+.pad{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; width:min(100%,340px)}
+.pad .key{font-size:30px; height:62px; padding:0; font-variant-numeric:tabular-nums}
+.pad .ok{background:var(--green); color:#fff; border-color:var(--green-edge); box-shadow:0 4px 0 var(--green-edge)}
+.pad .del{color:var(--ink-soft)}
+.note{border-radius:18px; padding:12px 16px; font-weight:800; font-size:18px; line-height:1.45; text-align:center; max-width:560px; width:100%}
+.note.hint{background:var(--hint-bg); color:var(--hint-ink); border:2px dashed var(--sun-edge)}
+.note.explain{background:var(--ok-bg); color:var(--ok-ink); border:2px solid var(--green)}
+.note .big{font-size:1.9em}
+.note .frames, .note .groups{margin-top:10px}
+.pv{display:flex; gap:8px; justify-content:center; margin-top:10px; flex-wrap:wrap}
+.pv span{display:flex; flex-direction:column; align-items:center; background:var(--card); border:2px solid var(--edge); border-radius:12px; padding:6px 10px; min-width:64px}
+.pv b{font-size:30px; color:var(--blue)} .pv small{font-size:12.5px; color:var(--ink-soft)}
+.fb{position:fixed; left:50%; top:calc(env(safe-area-inset-top,0px) + 14px); transform:translateX(-50%); z-index:20; padding:10px 22px; border-radius:999px; font-size:22px; font-weight:900; background:var(--card); border:3px solid var(--edge); box-shadow:0 6px 0 var(--edge); white-space:nowrap; pointer-events:none}
+.fb:empty{display:none}
+.fb.good{color:var(--green); border-color:var(--green)}
+.fb.bad{color:var(--bad); border-color:var(--bad)}
+.fb.info{color:var(--blue); border-color:var(--blue)}
+.cont{background:var(--green); color:#fff; border-color:var(--green-edge); box-shadow:0 5px 0 var(--green-edge); font-size:24px; padding:14px 34px; border-radius:22px}
+.helpbar{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:auto; padding:10px 0 8px; position:sticky; bottom:env(safe-area-inset-bottom,0px); background:linear-gradient(to bottom, transparent, var(--paper) 30%)}
+.helpbar .key{font-size:18px; min-height:60px}
+#btnHint{background:var(--sun); border-color:var(--sun-edge); box-shadow:0 4px 0 var(--sun-edge); color:var(--sun-ink)}
+
+.vwarn{display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin:12px 0 0; padding:12px 14px; border-radius:18px; background:var(--hint-bg); color:var(--hint-ink); border:2px solid var(--sun-edge); font-weight:800; font-size:15.5px; line-height:1.4}
+.vwarn[hidden]{display:none}
+.vwarn p{margin:0; flex:1 1 220px}
+.vwarn .key{padding:10px 14px; font-size:16px}
+
+/* ---------- Fin ---------- */
+.end{flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px; text-align:center}
+.end-t{font-size:clamp(40px,12vw,66px); font-weight:900; margin:0; line-height:1.05}
+.end-stars{font-size:70px; letter-spacing:10px; color:var(--line2); line-height:1}
+.end-stars .on{color:var(--sun); display:inline-block; animation:pop .55s both; text-shadow:0 4px 0 var(--sun-edge)}
+.end-stars .on:nth-child(2){animation-delay:.25s} .end-stars .on:nth-child(3){animation-delay:.5s}
+.end-msg{font-size:19px; font-weight:800; margin:0; max-width:420px; line-height:1.4}
+.end-btns{display:flex; gap:12px; flex-wrap:wrap; justify-content:center}
+.big{font-size:22px; padding:14px 26px; border-radius:22px}
+.primary{background:var(--green); color:#fff; border-color:var(--green-edge); box-shadow:0 5px 0 var(--green-edge)}
+
+/* ---------- Boîte à mots ---------- */
+.reader{background:var(--card); border:2px solid var(--edge); border-radius:22px; padding:16px; display:flex; flex-direction:column; align-items:center; gap:12px; margin-top:14px}
+.row2{display:flex; gap:10px; flex-wrap:wrap; justify-content:center}
+.free{display:flex; gap:8px; margin-top:14px}
+.free input, .field input{flex:1; min-width:0; font:inherit; font-size:18px; font-weight:700; padding:12px 14px; border-radius:14px; border:2px solid var(--edge); background:var(--card); color:var(--ink)}
+.wtabs{display:flex; gap:8px; margin:16px 0 10px; flex-wrap:wrap}
+.wtab{padding:8px 14px; border-radius:999px; font-size:15px}
+.wtab[aria-selected="true"]{background:var(--ink); color:var(--paper); border-color:var(--ink)}
+.wlist{display:flex; flex-wrap:wrap; gap:8px; padding-bottom:24px}
+.wchip{font-family:var(--font-read); font-size:23px; padding:8px 14px; border-radius:14px; font-weight:700}
+
+/* ---------- Réglages ---------- */
+dialog{border:none; border-radius:26px; padding:22px; width:min(92vw,440px); max-height:88vh; overflow:auto; background:var(--card); color:var(--ink); box-shadow:0 24px 70px rgba(0,0,0,.45)}
+dialog::backdrop{background:rgba(10,15,45,.55)}
+dialog h2{margin:0 0 16px; font-size:26px; font-weight:900}
+.field{display:flex; flex-direction:column; gap:8px; margin-bottom:16px; font-weight:800}
+.seg{display:flex; gap:6px} .seg .key{flex:1; padding:10px 6px; font-size:16px}
+.seg .key[aria-pressed="true"]{background:var(--ink); color:var(--paper); border-color:var(--ink)}
+.chk{display:flex; align-items:center; gap:12px; font-weight:800; margin-bottom:12px; font-size:17px}
+.chk input{width:26px; height:26px; accent-color:var(--green)}
+.note-small{font-size:14px; color:var(--ink-soft); font-weight:700; line-height:1.45; margin:6px 0 14px}
+.set-btns{display:flex; flex-direction:column; gap:10px}
+
+@media (max-width:380px){
+  .opts.letters .opt{width:84px; height:94px; font-size:46px}
+  .frames{--b:30px}
+  .num-c{min-width:54px; height:56px; font-size:23px}
+}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation:none !important; transition:none !important}
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <section id="home" class="view">
+    <header class="top">
+      <h1 class="brand" data-say="Mon petit cartable"><span class="s-r">Mon</span> <span class="s-b">pe</span><span class="s-r">tit</span> <span class="s-b">car</span><span class="s-r">ta</span><span class="s-b">ble</span></h1>
+      <div class="top-right">
+        <button class="key stars-pill" id="starsPill" aria-label="Mes étoiles">★ <b id="starCount">0</b></button>
+        <button class="key icon-btn" id="openSettings" aria-label="Réglages pour les parents">⚙</button>
+      </div>
+    </header>
+    <div class="vwarn" hidden role="alert">
+      <p>🔇 La voix ne sort pas. Ouvre la page dans <b>Chrome</b> (pas dans une autre appli), monte le volume et vérifie qu'une voix française est installée sur le téléphone.</p>
+      <button class="key vretry">🔊 Réessayer</button>
+    </div>
+    <p class="hello" id="hello">Bonjour ! À quoi on joue ?</p>
+    <div class="ages" id="ages" role="radiogroup" aria-label="Mon âge">
+      <span class="lbl">Mon âge</span>
+    </div>
+    <div class="subjects">
+      <button class="key subj" data-subj="lire" aria-pressed="true"><span class="g" aria-hidden="true">Aa</span> Lire</button>
+      <button class="key subj" data-subj="compter" aria-pressed="false"><span class="g" aria-hidden="true">123</span> Compter</button>
+    </div>
+    <div class="grid" id="grid"></div>
+    <p class="tip">Dans chaque jeu : 🔊 pour réécouter, 💡 pour avoir un indice. On peut aussi toucher un mot pour l'entendre.</p>
+  </section>
+
+  <section id="game" class="view" hidden>
+    <header class="g-top">
+      <button class="key back" data-home aria-label="Retour au menu">‹</button>
+      <h2 class="g-title" id="gTitle"></h2>
+    </header>
+    <div class="vwarn" hidden role="alert">
+      <p>🔇 La voix ne sort pas. Ouvre la page dans <b>Chrome</b> (pas dans une autre appli), monte le volume et vérifie qu'une voix française est installée sur le téléphone.</p>
+      <button class="key vretry">🔊 Réessayer</button>
+    </div>
+    <div class="beads" id="beads" aria-hidden="true"></div>
+    <div class="consigne">
+      <button class="key spk" id="spk" aria-label="Écouter la consigne">🔊</button>
+      <p id="consigne"></p>
+    </div>
+    <div class="stage" id="stage"></div>
+    <footer class="helpbar">
+      <button class="key" id="btnListen">🔊 Réécouter</button>
+      <button class="key" id="btnHint">💡 Un indice</button>
+    </footer>
+  </section>
+
+  <section id="end" class="view" hidden>
+    <div class="end">
+      <p class="end-t" id="endT">Bravo !</p>
+      <div class="end-stars" id="endStars" aria-hidden="true"></div>
+      <p class="end-msg" id="endMsg"></p>
+      <div class="end-btns">
+        <button class="key big primary" id="again">Rejouer</button>
+        <button class="key big" data-home>Autre jeu</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="words" class="view" hidden>
+    <header class="g-top">
+      <button class="key back" data-home aria-label="Retour au menu">‹</button>
+      <h2 class="g-title">La boîte à mots</h2>
+    </header>
+    <div class="reader">
+      <div id="rword" class="bigword"></div>
+      <div class="row2">
+        <button class="key" id="rSay">🔊 Lire le mot</button>
+        <button class="key" id="rSlow">🐢 Lire lentement</button>
+      </div>
+      <p class="note-small" style="margin:0">Touche un morceau du mot pour l'entendre tout seul.</p>
+    </div>
+    <div class="free">
+      <input id="freeTxt" type="text" placeholder="Écris un mot ou une phrase…" autocomplete="off" enterkeyhint="go" aria-label="Mot ou phrase à faire lire">
+      <button class="key" id="freeSay">🔊 Lire</button>
+    </div>
+    <div class="wtabs" id="wtabs" role="tablist" aria-label="Nombre de syllabes"></div>
+    <div class="wlist" id="wlist"></div>
+  </section>
+</div>
+
+<div class="fb" id="fb" aria-live="polite"></div>
+
+<dialog id="settings" aria-labelledby="setTitle">
+  <h2 id="setTitle">Réglages</h2>
+  <label class="field">Prénom de l'enfant
+    <input id="setName" type="text" maxlength="20" autocomplete="off" placeholder="Ex. : Léa">
+  </label>
+  <div class="field">Vitesse de la voix
+    <div class="seg" id="setRate">
+      <button class="key" data-r="0.7">Lente</button>
+      <button class="key" data-r="0.85">Normale</button>
+      <button class="key" data-r="1">Rapide</button>
+    </div>
+  </div>
+  <label class="chk"><input type="checkbox" id="setAuto"> Lire les consignes à voix haute</label>
+  <label class="chk"><input type="checkbox" id="setSfx"> Petits bruitages</label>
+  <p class="note-small" id="voiceNote"></p>
+  <div class="set-btns">
+    <button class="key" id="testVoice">🔊 Tester la voix</button>
+    <button class="key" id="resetStars">Remettre les étoiles à zéro</button>
+    <button class="key big primary" id="closeSettings">C'est parti !</button>
+  </div>
+</dialog>
+<script>
+'use strict';
+/* ================= Données ================= */
+const WORD_SRC = `chat chien loup ours coq lit pain lait nez pied main bras dos roi pont train bus sac bol jus riz vent feu jeu sel miel ciel mer bleu vert noir gris fleur bois lac four jour nuit gant clou chou rat parc banc
+pa-pa ma-man pa-pi ma-mie vé-lo mo-to ro-bot la-pin sa-pin ca-fé bé-bé té-lé fu-sée pou-pée é-pée tor-tue pin-gouin co-chon mou-ton dra-gon ca-nard hi-bou dou-dou ca-deau man-teau ba-teau cha-peau châ-teau gâ-teau cou-teau mar-teau bu-reau ri-deau oi-seau so-leil jar-din dau-phin ma-tin lu-tin ba-llon poi-sson pou-ssin cra-yon ca-hier ci-tron bon-bon ki-wi ra-dis sou-ris po-ney ba-lai mi-roir sty-lo tam-bour ti-roir co-pain pa-nier cou-ssin bou-ton ma-rron gar-çon pan-da lé-zard cas-tor tou-can rai-sin bis-cuit gi-let mai-son hi-ver é-té si-rop car-ton mou-choir é-cran cha-ton cha-meau wa-gon ta-pis bam-bou jam-bon bi-sou câ-lin doc-teur pom-pier fac-teur chan-teur mo-teur trac-teur vol-can cou-leur
+é-lé-phant cho-co-lat pa-pi-llon kan-gou-rou do-mi-no ca-na-pé a-na-nas ha-ri-cot a-bri-cot a-ni-mal pa-ra-pluie é-cu-reuil hé-ri-sson ca-ra-mel ma-ca-ron ro-bi-net po-ti-ron ta-bou-ret é-pi-nard ca-ri-bou pan-ta-lon cha-pi-teau cor-ni-chon ho-ri-zon ma-ga-sin po-lo-chon ca-la-mar py-ja-ma ci-né-ma ca-na-ri co-li-bri o-ka-pi ouis-ti-ti la-va-bo pé-da-lo nu-mé-ro ki-mo-no pa-ra-sol sa-fa-ri ta-ta-mi sa-la-mi ca-ba-non
+or-di-na-teur a-lli-ga-tor ma-ca-ro-ni é-lé-phan-teau mé-di-ca-ment dé-mé-na-geur ca-ta-ma-ran as-pi-ra-teur tri-cé-ra-tops di-plo-do-cus co-co-ri-co a-ni-ma-teur`;
+const WORDS = WORD_SRC.trim().split(/\s+/).map(t => { const s = t.split('-'); return { w: s.join(''), s }; });
+
+const PHR_SRC = `1|Le chat boit du _.|lait|sable|bois
+1|La nuit, on voit la _ dans le ciel.|lune|soupe|table
+1|Je mets mes _ pour marcher.|chaussures|cuillères|nuages
+1|Le poisson nage dans l'_.|eau|armoire|herbe
+1|Il pleut, je prends mon _.|parapluie|gâteau|oreiller
+1|L'oiseau vole dans le _.|ciel|four|tiroir
+1|Le soir, je me brosse les _.|dents|livres|chaises
+1|La neige est _.|blanche|verte|chaude
+1|Pour lire, j'ouvre mon _.|livre|frigo|parapluie
+1|Le boulanger fait du _.|pain|sable|papier
+1|Le lapin croque une _.|carotte|chaise|voiture
+1|Je dors dans mon _.|lit|bol|sac
+1|La vache fait _.|meuh|miaou|cocorico
+1|En hiver, il fait _.|froid|chaud|sucré
+1|Le pompier éteint le _.|feu|livre|gâteau
+1|Avec mes yeux, je peux _.|voir|sentir|entendre
+1|Je bois de l'eau dans un _.|verre|marteau|coussin
+1|La maîtresse écrit au _.|tableau|plafond|jardin
+1|Le bébé boit son _.|biberon|stylo|chapeau
+1|Pour couper la viande, on prend un _.|couteau|crayon|ballon
+2|Les enfants _ dans la cour.|jouent|joue|jouer
+2|Hier, nous _ au parc.|sommes allés|allons|irons
+2|Demain, j'_ chez mamie.|irai|allais|ira
+2|Ma sœur a les cheveux très _.|longs|longue|lent
+2|Le train part de la _.|gare|plage|cuisine
+2|Les feuilles des arbres tombent en _.|automne|été|printemps
+2|Le facteur apporte le _.|courrier|dessert|soleil
+2|Pour découper le papier, j'utilise des _.|ciseaux|oreillers|cuillères
+2|Une année compte douze _.|mois|jours|semaines
+2|Les abeilles fabriquent le _.|miel|lait|pain
+2|La tortue avance très _.|lentement|vite|haut
+2|Il faut _ la rue sur le passage piéton.|traverser|manger|dessiner
+2|Le médecin soigne les _.|malades|voitures|arbres
+2|Nous _ une cabane dans le jardin.|construisons|construit|construire
+2|Elles sont _ de leur dessin.|fières|fier|fière
+2|Au zoo, la girafe a un très long _.|cou|nez|bras
+2|Une semaine a _ jours.|sept|cinq|dix
+2|Quand il fait nuit, on allume la _.|lumière|fenêtre|chaise
+2|Au printemps, les oiseaux _ leur nid.|construisent|construit|construis
+2|Mon frère et moi, nous _ de la musique.|faisons|fait|font`;
+const PHR = PHR_SRC.trim().split('\n').map(l => { const [lv, t, a, ...o] = l.split('|'); return { lv: Number(lv), t, a, o }; });
+
+const NOM = {A:'a',B:'bé',C:'cé',D:'dé',E:'eu',F:'èfe',G:'gé',H:'hache',I:'i',J:'ji',K:'ka',L:'èle',M:'ème',N:'ène',O:'o',P:'pé',Q:'ku',R:'ère',S:'èsse',T:'té',U:'u',V:'vé',W:'double vé',X:'ix',Y:'i grec',Z:'zède'};
+const EX = {A:'avion',B:'bateau',C:'cadeau',D:'dragon',E:'éléphant',F:'fusée',G:'gâteau',H:'hibou',I:'igloo',J:'jardin',K:'kiwi',L:'lapin',M:'maman',N:'nuit',O:'orange',P:'papa',Q:'quatre',R:'robot',S:'soleil',T:'tortue',U:'usine',V:'vélo',W:'wagon',X:'xylophone',Y:'yaourt',Z:'zèbre'};
+const VSOUND = {a:'a',i:'i',o:'o',u:'u','é':'é',ou:'où',on:'on',an:'an'};
+const NAMES = [['Léa','f'],['Tom','m'],['Inès','f'],['Lucas','m'],['Zoé','f'],['Hugo','m'],['Jade','f'],['Nour','f'],['Adam','m'],['Chloé','f'],['Sami','m'],['Emma','f'],['Noé','m'],['Lina','f']];
+const OBJS = ['billes','bonbons','cartes','crayons','fraises','perles','pommes','coquillages','gâteaux','livres','timbres','cerises'];
+const PLACE = ['unités','dizaines','centaines','milliers'];
+const EXCH = ['une dizaine','une centaine','un millier'];
+const PRAISE = ['Bravo !','Super !','Génial !','Bien joué !',"C'est ça !",'Magnifique !','Excellent !','Tu as trouvé !','Formidable !'];
+const OOPS = ['Presque ! Essaie encore.','Pas tout à fait. Essaie encore !','Oups ! Regarde bien et réessaie.',"Ce n'est pas grave, essaie encore !"];
+
+/* ================= Outils ================= */
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const rnd = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+const pick = a => a[Math.floor(Math.random() * a.length)];
+const shuffle = arr => { const a = [...arr]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const uniqBy = (arr, f) => { const seen = new Set(); return arr.filter(x => { const k = f(x); if (seen.has(k)) return false; seen.add(k); return true; }); };
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const wait = ms => new Promise(r => setTimeout(r, ms));
+const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+const digit = (n, j) => Math.floor(n / Math.pow(10, j)) % 10;
+const plural = (n, s, p) => `${n} ${n > 1 ? p : s}`;
+const spoken = s => String(s)
+  .replace(/\s*\+\s*/g, ' plus ')
+  .replace(/\s*−\s*/g, ' moins ')
+  .replace(/\s*×\s*/g, ' fois ')
+  .replace(/\s*=\s*\?/g, ' égale combien ?')
+  .replace(/\s*=\s*/g, ' égale ');
+function el(html) { const t = document.createElement('template'); t.innerHTML = html.trim(); return t.content.firstElementChild; }
+
+/* ================= Sauvegarde locale ================= */
+const KEY = 'monPetitCartable.v1';
+function loadState() { try { const v = localStorage.getItem(KEY); return v ? JSON.parse(v) : {}; } catch (e) { return {}; } }
+const S = Object.assign({ name: '', age: 5, stars: 0, best: {}, rate: 0.85, auto: true, sfx: true, subj: 'lire' }, loadState());
+function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* stockage indisponible */ } }
+
+/* ================= Voix ================= */
+const Voice = {
+  ok: typeof window !== 'undefined' && 'speechSynthesis' in window && typeof SpeechSynthesisUtterance !== 'undefined',
+  v: null, keep: [], seqTok: 0,
+  init() {
+    if (!this.ok) { updateVoiceNote(); return; }
+    const pickV = () => {
+      const vs = speechSynthesis.getVoices() || [];
+      const fr = vs.filter(v => /^fr/i.test(v.lang));
+      this.v = fr.find(v => /fr[-_]FR/i.test(v.lang) && v.localService) || fr.find(v => /fr[-_]FR/i.test(v.lang)) || fr[0] || null;
+      updateVoiceNote();
+    };
+    pickV();
+    if (speechSynthesis.addEventListener) speechSynthesis.addEventListener('voiceschanged', pickV);
+    else speechSynthesis.onvoiceschanged = pickV;
+  },
+  stop() { this.seqTok++; if (this.ok) speechSynthesis.cancel(); },
+  worked: false, checkT: 0,
+  say(text, o = {}) {
+    if (!o.fromSeq) this.seqTok++;
+    return new Promise(res => {
+      let done = false; const fin = () => { if (!done) { done = true; res(); } };
+      const rate = o.rate || S.rate;
+      const t = String(text || '');
+      if (!this.ok || !t) { if (!this.ok && t) voiceProblem(); setTimeout(fin, o.fromSeq ? 350 : 700); return; }
+      const guard = setTimeout(fin, 1400 + t.length * 95 / rate);
+      const u = new SpeechSynthesisUtterance(t);
+      u.lang = 'fr-FR'; if (this.v) u.voice = this.v;
+      u.rate = rate; u.pitch = o.pitch || 1.08; u.volume = 1;
+      u.onstart = () => { this.worked = true; hideVoiceProblem(); };
+      u.onend = () => { clearTimeout(guard); fin(); };
+      u.onerror = ev => {
+        clearTimeout(guard);
+        const er = ev && ev.error;
+        if (er && er !== 'interrupted' && er !== 'canceled') voiceProblem();
+        fin();
+      };
+      this.keep.push(u); if (this.keep.length > 30) this.keep.shift();
+      const go = () => {
+        try { speechSynthesis.resume(); } catch (e) {}
+        speechSynthesis.speak(u);
+        if (!this.worked) { clearTimeout(this.checkT); this.checkT = setTimeout(() => { if (!this.worked) voiceProblem(); }, 4000); }
+      };
+      /* Chrome Android ignore parfois une phrase lancée juste après cancel() :
+         on n'annule que si quelque chose parle déjà, puis on laisse un court délai. */
+      if (speechSynthesis.speaking || speechSynthesis.pending) { speechSynthesis.cancel(); setTimeout(go, 120); }
+      else go();
+    });
+  },
+  async seq(parts, gap = 300, o = {}) {
+    const tok = ++this.seqTok;
+    for (let i = 0; i < parts.length; i++) {
+      if (tok !== this.seqTok) return false;
+      if (o.onEach) o.onEach(i);
+      await this.say(parts[i], { rate: o.rate, fromSeq: true });
+      if (tok !== this.seqTok) return false;
+      await wait(gap);
+    }
+    if (o.onEach) o.onEach(-1);
+    return true;
+  }
+};
+function unlockAudio() {
+  try { if (Voice.ok && !speechSynthesis.speaking) { const u = new SpeechSynthesisUtterance(' '); u.volume = 0; speechSynthesis.speak(u); } } catch (e) {}
+  try { getAC(); } catch (e) {}
+}
+/* Bandeau quand la voix ne sort pas */
+function voiceProblem() { $$('.vwarn').forEach(b => { b.hidden = false; }); }
+function hideVoiceProblem() { $$('.vwarn').forEach(b => { b.hidden = true; }); }
+
+/* ================= Bruitages ================= */
+let AC = null;
+function getAC() { if (!AC) { const C = window.AudioContext || window.webkitAudioContext; if (C) AC = new C(); } if (AC && AC.state === 'suspended') AC.resume(); return AC; }
+function sfx(kind) {
+  if (!S.sfx) return;
+  try {
+    const ac = getAC(); if (!ac) return;
+    const now = ac.currentTime + 0.01;
+    const notes = kind === 'good' ? [523.25, 659.25, 783.99] : kind === 'bad' ? [246.94, 207.65] : [783.99, 987.77, 1174.66, 1567.98];
+    const stepT = kind === 'star' ? 0.1 : 0.11;
+    notes.forEach((f, i) => {
+      const o = ac.createOscillator(), g = ac.createGain();
+      o.type = kind === 'bad' ? 'triangle' : 'sine'; o.frequency.value = f;
+      const t = now + i * stepT;
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(kind === 'bad' ? 0.12 : 0.16, t + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.3);
+      o.connect(g); g.connect(ac.destination); o.start(t); o.stop(t + 0.32);
+    });
+  } catch (e) {}
+}
+
+/* ================= Briques d'interface ================= */
+function sylHTML(syls, o = {}) {
+  const tap = o.tap !== false, col = o.color !== false;
+  return syls.map((s, i) => `<span class="syl${col ? (i % 2 ? ' s-b' : ' s-r') : ''}"${tap ? ` data-say="${esc(s)}"` : ''}>${esc(s)}</span>`).join('');
+}
+function litSyl(root, i, colorIt) {
+  const spans = $$('.syl', root);
+  spans.forEach(s => s.classList.remove('lit'));
+  if (i >= 0 && spans[i]) { spans[i].classList.add('lit'); if (colorIt) spans[i].classList.add(i % 2 ? 's-b' : 's-r'); }
+}
+function bigEar(onTap, label = 'Écoute') {
+  const b = el(`<button class="key ear" aria-label="Écouter"><span aria-hidden="true">🔊</span><small>${label}</small></button>`);
+  b.onclick = onTap; return b;
+}
+function optsRow(items, o) {
+  const row = el(`<div class="opts answers ${o.cls || ''}"></div>`);
+  const label = o.label || (x => esc(x));
+  items.forEach(it => {
+    const b = el(`<button class="key opt">${label(it)}</button>`);
+    b.dataset.v = String(it);
+    b.onclick = () => (String(it) === String(o.correct) ? A.correct(b) : A.wrong(b));
+    if (o.speaker) {
+      const w = el('<div class="opt-wrap"></div>');
+      const s = el(`<button class="key mini-spk" aria-label="Écouter ${esc(it)}">🔊</button>`);
+      s.dataset.say = String(it);
+      w.append(b, s); row.append(w);
+    } else row.append(b);
+  });
+  return row;
+}
+function dropOne(row, correct) {
+  if (!row) return;
+  const c = $$('.opt:not(:disabled)', row).filter(b => b.dataset.v !== String(correct));
+  if (c.length > 1 || (c.length === 1 && $$('.opt:not(:disabled)', row).length > 2)) { const b = pick(c); b.disabled = true; }
+}
+function markRight(row, correct) {
+  if (!row) return;
+  $$('.opt', row).forEach(b => { if (b.dataset.v === String(correct)) b.classList.add('good'); else b.disabled = true; });
+}
+function noteBox(html, kind = 'hint') {
+  const st = $('#stage');
+  let h = $('.note', st);
+  if (!h) {
+    h = document.createElement('div');
+    const ans = $('.answers', st);
+    if (ans) st.insertBefore(h, ans); else st.append(h);
+  }
+  h.className = 'note ' + kind;
+  h.innerHTML = (kind === 'hint' ? '<span aria-hidden="true">💡 </span>' : '') + html;
+  void h.offsetWidth; h.classList.add('pop');
+  return h;
+}
+function fb(t, cls) {
+  const f = $('#fb');
+  f.textContent = t; f.className = 'fb ' + cls;
+  void f.offsetWidth; f.classList.add('pop');
+  clearTimeout(fb.tm);
+  if (cls !== 'good') fb.tm = setTimeout(() => { f.textContent = ''; }, 2200);
+}
+function shake(e) { if (!e) return; e.classList.remove('shake'); void e.offsetWidth; e.classList.add('shake'); }
+function pulse(e) { if (!e) return; e.classList.remove('pulse'); void e.offsetWidth; e.classList.add('pulse'); }
+
+/* Perles rangées par boîtes de 10 */
+function frames(segs, o = {}) {
+  const list = [];
+  segs.forEach(sg => { for (let i = 0; i < sg.n; i++) list.push(sg.cls || ''); });
+  const nf = Math.max(1, Math.ceil(list.length / 10));
+  const wrap = el('<div class="frames"></div>');
+  if (o.size) wrap.style.setProperty('--b', o.size + 'px');
+  for (let f = 0; f < nf; f++) {
+    const fr = el('<div class="frame"></div>');
+    for (let c = 0; c < 10; c++) {
+      const idx = f * 10 + c, has = idx < list.length;
+      const cell = document.createElement(o.tap && has ? 'button' : 'span');
+      cell.className = 'cell' + (has ? ' on ' + list[idx] : '');
+      if (o.tap && has) { cell.type = 'button'; cell.setAttribute('aria-label', 'perle'); }
+      fr.append(cell);
+    }
+    wrap.append(fr);
+  }
+  return wrap;
+}
+function beadsFor(op, a, b) {
+  return op === '+' ? frames([{ n: a }, { n: b, cls: 'c2' }]) : frames([{ n: a - b }, { n: b, cls: 'x' }]);
+}
+function decomp(n) {
+  const names = [['millier', 'milliers'], ['centaine', 'centaines'], ['dizaine', 'dizaines'], ['unité', 'unités']];
+  const d = [digit(n, 3), digit(n, 2), digit(n, 1), digit(n, 0)];
+  const start = n >= 1000 ? 0 : n >= 100 ? 1 : 2;
+  const parts = [];
+  for (let i = start; i < 4; i++) parts.push(`${d[i]} ${d[i] > 1 ? names[i][1] : names[i][0]}`);
+  return parts.slice(0, -1).join(', ') + ' et ' + parts[parts.length - 1];
+}
+function pvTable(n) {
+  const labels = ['milliers', 'centaines', 'dizaines', 'unités'];
+  const start = n >= 1000 ? 0 : n >= 100 ? 1 : 2;
+  let h = '<div class="pv">';
+  for (let i = start; i < 4; i++) h += `<span><b>${digit(n, 3 - i)}</b><small>${labels[i]}</small></span>`;
+  return h + '</div>';
+}
+function numOpts(ans, count, deltas, min, max, extra = []) {
+  const s = new Set([ans]);
+  extra.forEach(v => { if (s.size < count && v >= min && v <= max) s.add(v); });
+  let g = 0;
+  while (s.size < count && g++ < 300) { const v = ans + pick(deltas) * (Math.random() < .5 ? -1 : 1); if (v >= min && v <= max) s.add(v); }
+  g = 0;
+  while (s.size < count && g++ < 300) s.add(rnd(min, max));
+  return shuffle([...s]);
+}
+function sentenceEl(text, cls, onBlank) {
+  const p = el(`<p class="sentence read ${cls || ''}"></p>`);
+  text.split(' ').forEach((tok, i) => {
+    if (i) p.append(' ');
+    if (tok.includes('_')) {
+      const [b, a] = tok.split('_');
+      if (b) p.append(b);
+      const bl = el('<span class="blank">&nbsp;</span>');
+      if (onBlank) onBlank(bl);
+      p.append(bl);
+      if (a) p.append(a);
+    } else {
+      const clean = tok.replace(/[.,!?;:]/g, '');
+      p.append(el(`<span class="w" data-say="${esc(clean)}">${esc(tok)}</span>`));
+    }
+  });
+  return p;
+}
+/* Clavier de nombres */
+function keypad(onInput, onSubmit, maxLen) {
+  let v = '';
+  const pad = el('<div class="pad answers" role="group" aria-label="Clavier"></div>');
+  const clear = () => { v = ''; onInput(v); };
+  ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'del', '0', 'ok'].forEach(k => {
+    const lab = k === 'del' ? 'Effacer' : k === 'ok' ? 'Valider' : k;
+    const b = el(`<button class="key${k === 'ok' ? ' ok' : ''}${k === 'del' ? ' del' : ''}" aria-label="${lab}">${k === 'del' ? '⌫' : k === 'ok' ? '✓' : k}</button>`);
+    b.onclick = () => {
+      if (!G || G.locked) return;
+      if (k === 'del') v = v.slice(0, -1);
+      else if (k === 'ok') { if (v !== '') onSubmit(v, clear); return; }
+      else if (v.length < maxLen) v = (v === '0' ? '' : v) + k;
+      onInput(v);
+    };
+    pad.append(b);
+  });
+  pad.set = val => { v = String(val); onInput(v); };
+  return pad;
+}
+function numPad(st, ans, render, disp) {
+  const pad = keypad(render, (v, clear) => {
+    if (Number(v) === ans) { if (disp) disp.classList.add('ok'); A.correct(null); }
+    else {
+      if (disp) { disp.classList.add('bad'); shake(disp); }
+      A.wrong(null);
+      setTimeout(() => { if (G && !G.locked) { clear(); if (disp) disp.classList.remove('bad'); } }, 700);
+    }
+  }, String(ans).length + 1);
+  st.append(pad);
+  return pad;
+}
+/* Opération posée en colonnes */
+function posee(a, b, op, ansLen) {
+  const As = String(a), Bs = String(b);
+  const w = Math.max(As.length, Bs.length, ansLen) + 1;
+  const g = el(`<div class="posee" role="img" aria-label="${a} ${op === '+' ? 'plus' : 'moins'} ${b}"></div>`);
+  g.style.gridTemplateColumns = `repeat(${w}, auto)`;
+  const carries = [];
+  for (let i = 0; i < w; i++) { const c = el('<span class="c carry"></span>'); carries.push(c); g.append(c); }
+  const row = (s, first) => {
+    for (let i = 0; i < w; i++) {
+      const off = w - s.length; let t = '';
+      if (i === 0 && first) t = first; else if (i >= off) t = s[i - off];
+      g.append(el(`<span class="c">${t}</span>`));
+    }
+  };
+  row(As, ''); row(Bs, op === '+' ? '+' : '−');
+  g.append(el('<span class="rule"></span>'));
+  const res = [];
+  for (let i = 0; i < w; i++) { const c = el(`<span class="c${i > 0 ? ' r' : ''}"></span>`); res.push(c); g.append(c); }
+  return {
+    node: g,
+    set(v) { res.forEach(c => { c.textContent = ''; }); const s = String(v); for (let j = 0; j < s.length && j < w - 1; j++) res[w - 1 - j].textContent = s[s.length - 1 - j]; },
+    carry(col, t) { if (carries[w - 1 - col]) carries[w - 1 - col].textContent = t; }
+  };
+}
+
+/* ================= Les jeux ================= */
+const ACTS = [
+  { id: 'lettres', subj: 'lire', min: 5, max: 6, t: 'Les lettres', d: 'Écoute et trouve la lettre', ico: '<span class="s-r">A</span><span class="s-b">a</span>' },
+  { id: 'sons', subj: 'lire', min: 5, max: 7, t: 'Les sons', d: 'Assemble deux lettres', ico: '<span class="s-b">m</span>+<span class="s-r">a</span>' },
+  { id: 'syllabes', subj: 'lire', min: 5, max: 7, t: 'Tape les syllabes', d: 'Compte les morceaux du mot', ico: '<span class="s-r">la</span><span class="s-b">pin</span>' },
+  { id: 'ecoute', subj: 'lire', min: 5, max: 9, t: 'Trouve le mot', d: 'Écoute et touche le bon mot', ico: '« <span class="s-r">mot</span> »' },
+  { id: 'construis', subj: 'lire', min: 6, max: 9, t: 'Construis le mot', d: 'Remets les syllabes dans l’ordre', ico: '<span class="s-b">teau</span> <span class="s-r">ba</span>' },
+  { id: 'manquante', subj: 'lire', min: 6, max: 9, t: 'La syllabe cachée', d: 'Trouve le morceau qui manque', ico: '<span class="s-r">gâ</span><span class="s-b">?</span>' },
+  { id: 'dictee', subj: 'lire', min: 7, max: 9, t: 'Dictée magique', d: 'Écris le mot avec les lettres', ico: '<u>a</u> <u>b</u> <u>c</u>' },
+  { id: 'phrase', subj: 'lire', min: 7, max: 9, t: 'Complète la phrase', d: 'Lis et trouve le mot qui manque', ico: 'Le <span class="s-b">…</span>' },
+  { id: 'mots', subj: 'lire', min: 5, max: 9, t: 'La boîte à mots', d: 'Touche un mot pour l’entendre', ico: '<span class="s-r">A</span><span class="s-b">B</span><span class="s-r">C</span>' },
+  { id: 'compter', subj: 'compter', min: 5, max: 6, t: 'Compte les perles', d: 'Combien y en a-t-il ?', ico: '<span class="dots"><i></i><i></i><i></i></span>' },
+  { id: 'nombre', subj: 'compter', min: 5, max: 9, t: 'Écoute le nombre', d: 'Touche le nombre entendu', ico: '17' },
+  { id: 'compare', subj: 'compter', min: 5, max: 9, t: 'Le plus grand', d: 'Compare les nombres', ico: '8 &gt; 3' },
+  { id: 'suite', subj: 'compter', min: 5, max: 9, t: 'Les suites', d: 'Trouve le nombre qui manque', ico: '2 4 <span class="s-r">?</span>' },
+  { id: 'addition', subj: 'compter', min: 5, max: 9, t: 'Additions', d: 'On ajoute', ico: '3+2' },
+  { id: 'soustraction', subj: 'compter', min: 5, max: 9, t: 'Soustractions', d: 'On enlève', ico: '7−4' },
+  { id: 'multi', subj: 'compter', min: 8, max: 9, t: 'Multiplications', d: 'Les tables', ico: '3×4' },
+  { id: 'probleme', subj: 'compter', min: 7, max: 9, t: 'Petits problèmes', d: 'Lis l’histoire et calcule', ico: '<span class="s-r">?</span> + <span class="s-r">?</span>' }
+];
+
+const GEN = {
+  /* ---------- LIRE ---------- */
+  lettres(age) {
+    const pool = (age <= 5 ? 'ABCDEFILMNOPRSTUV' : 'ABCDEFGHIJKLMNOPQRSTUVWXYZ').split('');
+    const t = pick(pool);
+    const lower = age >= 6 && Math.random() < .5;
+    const n = age <= 5 ? 3 : 4;
+    const others = shuffle(pool.filter(x => x !== t)).slice(0, n - 1);
+    const CONF = { B: 'D', D: 'B', P: 'Q', Q: 'P', M: 'N', N: 'M', U: 'N', I: 'L', L: 'I', E: 'F', F: 'E', O: 'Q' };
+    if (CONF[t] && pool.includes(CONF[t]) && !others.includes(CONF[t])) others[0] = CONF[t];
+    const opts = shuffle([t, ...others]);
+    const show = x => lower ? x.toLowerCase() : x;
+    return {
+      key: t + (lower ? 'm' : 'M'),
+      consigne: lower ? 'Écoute et touche la petite lettre.' : 'Écoute et touche la lettre.',
+      say: `Trouve la lettre ${NOM[t]}.`,
+      answerSay: NOM[t],
+      build(st) {
+        st.append(bigEar(() => Voice.say(NOM[t])));
+        this.row = optsRow(opts, { correct: t, cls: 'letters', label: x => `<span class="read">${show(x)}</span>` });
+        st.append(this.row);
+      },
+      hint() { dropOne(this.row, t); noteBox('Écoute bien le nom de la lettre et le mot qui commence pareil.'); return Voice.say(`${NOM[t]}, comme ${EX[t]}.`); },
+      reveal() { markRight(this.row, t); },
+      onSolved() { noteBox(`<span class="read big">${t} ${t.toLowerCase()}</span><br>comme <span class="read">${EX[t]}</span>`, 'explain'); },
+      after: `${NOM[t]}, comme ${EX[t]}.`
+    };
+  },
+
+  sons(age) {
+    const CONS = ['b', 'd', 'f', 'j', 'l', 'm', 'n', 'p', 'r', 's', 't', 'v'];
+    const V1 = ['a', 'i', 'o', 'u', 'é'], V2 = ['ou', 'on', 'an'];
+    let c, v;
+    if (age >= 7 && Math.random() < .7) {
+      if (Math.random() < .35) { c = 'ch'; v = pick(['a', 'i', 'o', 'ou', 'on', 'an']); }
+      else { c = pick(CONS); v = pick(V2); }
+    } else { c = pick(CONS); v = pick(V1); }
+    const ans = c + v;
+    const n = age <= 5 ? 3 : 4;
+    const vows = age >= 7 ? V1.concat(V2) : V1;
+    const set = new Set([ans]); let g = 0;
+    while (set.size < n && g++ < 100) set.add(Math.random() < .5 ? c + pick(vows) : pick(CONS.filter(x => x !== c)) + v);
+    const opts = shuffle([...set]);
+    const cName = c === 'ch' ? 'cé, hache' : NOM[c.toUpperCase()];
+    const vName = VSOUND[v];
+    return {
+      key: ans,
+      consigne: 'Assemble les lettres. Quelle syllabe ça fait ?',
+      say: `${cName} et ${vName}. Ça fait quoi ?`,
+      answerSay: ans,
+      build(st) {
+        const r = el(`<div class="assemble"><button class="key ltile cons read" aria-label="Écouter la lettre">${c}</button><span class="op">+</span><button class="key ltile vow read" aria-label="Écouter le son">${v}</button><span class="op">=</span><span class="qm read">?</span></div>`);
+        $('.cons', r).onclick = () => Voice.say(cName);
+        $('.vow', r).onclick = () => Voice.say(vName);
+        this.qm = $('.qm', r);
+        st.append(r);
+        this.row = optsRow(opts, { correct: ans, cls: 'syls', label: x => `<span class="read">${esc(x)}</span>` });
+        st.append(this.row);
+      },
+      hint() { dropOne(this.row, ans); noteBox('Écoute bien le son, puis cherche comment il s’écrit.'); return Voice.say(`Écoute : ${ans}`, { rate: S.rate * 0.8 }); },
+      reveal() { markRight(this.row, ans); },
+      onSolved() { this.qm.textContent = ans; this.qm.classList.add('done'); },
+      after: ans
+    };
+  },
+
+  syllabes(age) {
+    const lens = age <= 6 ? [1, 2, 3] : [2, 3, 4];
+    const x = pick(WORDS.filter(w => lens.includes(w.s.length)));
+    const n = x.s.length;
+    return {
+      key: x.w,
+      consigne: 'Combien de syllabes ? Tape dans tes mains à chaque morceau !',
+      say: `Écoute le mot : ${x.w}. Combien de syllabes ?`,
+      answerSay: String(n),
+      build(st) {
+        this.word = el(`<button class="key bigword" aria-label="Écouter le mot">${esc(x.w)}</button>`);
+        this.word.onclick = e => { if (e.target.closest('.syl')) return; Voice.say(x.w); };
+        st.append(this.word);
+        this.row = optsRow([1, 2, 3, 4], { correct: n, cls: 'counts', label: k => `<span class="num">${k}</span><span class="claps" aria-hidden="true">${'<i></i>'.repeat(k)}</span>` });
+        st.append(this.row);
+      },
+      hint() {
+        noteBox('Écoute : je coupe le mot en morceaux. Compte-les !');
+        this.word.innerHTML = sylHTML(x.s, { color: false });
+        return Voice.seq(x.s, 450, { onEach: i => litSyl(this.word, i, true) });
+      },
+      reveal() { markRight(this.row, n); },
+      onSolved() { this.word.innerHTML = sylHTML(x.s); },
+      after() { return Voice.seq(x.s, 350, { onEach: i => litSyl(this.word, i) }); }
+    };
+  },
+
+  ecoute(age) {
+    const lens = age <= 5 ? [1, 2] : age === 6 ? [2] : age === 7 ? [2, 3] : [2, 3, 4];
+    const pool = WORDS.filter(w => lens.includes(w.s.length));
+    const x = pick(pool);
+    const n = age <= 6 ? 3 : 4;
+    const others = pool.filter(y => y.w !== x.w);
+    const near = others.filter(y => age >= 8 ? y.w.slice(0, 2) === x.w.slice(0, 2) : y.w[0] === x.w[0]);
+    const same1 = others.filter(y => y.w[0] === x.w[0]);
+    const cand = uniqBy(shuffle(near).concat(shuffle(same1), shuffle(others)), y => y.w).slice(0, n - 1);
+    const opts = shuffle([x, ...cand]);
+    const colored = age <= 6;
+    const firstIsWord = x.s.length === 1;
+    const L = x.w[0].toUpperCase();
+    return {
+      key: x.w,
+      consigne: 'Écoute et touche le bon mot.',
+      say: `Trouve le mot : ${x.w}.`,
+      answerSay: x.w,
+      build(st) {
+        st.append(bigEar(() => Voice.say(x.w)));
+        this.row = optsRow(opts.map(o => o.w), {
+          correct: x.w, cls: 'words',
+          label: w => { const o = opts.find(p => p.w === w); return `<span class="read">${colored ? sylHTML(o.s, { tap: false }) : esc(w)}</span>`; }
+        });
+        st.append(this.row);
+      },
+      hint() {
+        dropOne(this.row, x.w);
+        if (firstIsWord && NOM[L]) { noteBox(`Le mot commence par la lettre <b class="read">${L}</b>.`); return Voice.say(`Le mot commence par la lettre ${NOM[L]}.`); }
+        noteBox(`Le mot commence par <b class="read">${esc(x.s[0])}</b>.`);
+        return Voice.say(`Le mot commence par : ${x.s[0]}.`);
+      },
+      reveal() { markRight(this.row, x.w); },
+      after() { return age <= 7 ? Voice.seq(x.s.concat([x.w]), 250) : Voice.say(x.w); }
+    };
+  },
+
+  construis(age) {
+    const lens = age <= 7 ? [2, 3] : [3, 4];
+    const x = pick(WORDS.filter(w => lens.includes(w.s.length) && new Set(w.s).size === w.s.length));
+    const tiles = x.s.map((s, i) => ({ s, id: i }));
+    if (age >= 8) { let d, g = 0; do { d = pick(pick(WORDS).s); } while (x.s.includes(d) && g++ < 50); tiles.push({ s: d, id: 99 }); }
+    let order, g = 0;
+    do { order = shuffle(tiles); } while (order.slice(0, x.s.length).map(t => t.s).join('|') === x.s.join('|') && g++ < 30);
+    return {
+      key: x.w,
+      consigne: 'Construis le mot : touche les syllabes dans l’ordre.',
+      say: `Construis le mot : ${x.w}.`,
+      answerSay: x.w,
+      build(st) {
+        st.append(bigEar(() => Voice.say(x.w)));
+        const slots = el('<div class="slots answers"></div>');
+        const tray = el('<div class="tray"></div>');
+        this.filled = x.s.map(() => null);
+        this.slotEls = x.s.map((_, i) => {
+          const b = el(`<button class="key slot" aria-label="Case ${i + 1}"></button>`);
+          b.onclick = () => this.unplace(i);
+          slots.append(b); return b;
+        });
+        order.forEach(t => {
+          const b = el(`<button class="key stile">${esc(t.s)}</button>`);
+          b.onclick = () => this.place(t);
+          t.el = b; tray.append(b);
+        });
+        st.append(slots, tray);
+      },
+      place(t) {
+        if (!G || G.locked || t.el.classList.contains('used')) return;
+        const k = this.filled.indexOf(null); if (k < 0) return;
+        this.filled[k] = t; t.el.classList.add('used');
+        const sl = this.slotEls[k];
+        sl.textContent = t.s; sl.classList.add('filled', k % 2 ? 's-b' : 's-r');
+        if (!this.filled.includes(null)) this.check(); else Voice.say(t.s);
+      },
+      unplace(k) {
+        if (!G || G.locked) return;
+        const t = this.filled[k]; if (!t) return;
+        this.filled[k] = null; t.el.classList.remove('used');
+        const sl = this.slotEls[k];
+        sl.textContent = ''; sl.classList.remove('filled', 's-r', 's-b');
+      },
+      check() {
+        const ok = this.filled.every((t, i) => t.s === x.s[i]);
+        if (ok) { this.slotEls.forEach(s => s.classList.add('good')); A.correct(null); }
+        else {
+          this.slotEls.forEach(s => shake(s));
+          A.wrong(null);
+          setTimeout(() => { if (G && !G.locked) this.filled.forEach((t, i) => { if (t && t.s !== x.s[i]) this.unplace(i); }); }, 750);
+        }
+      },
+      hint() {
+        const k = this.filled.findIndex((t, i) => !t || t.s !== x.s[i]);
+        if (k < 0) return;
+        for (let i = k; i < this.filled.length; i++) if (this.filled[i] && this.filled[i].s !== x.s[i]) this.unplace(i);
+        if (this.filled[k]) this.unplace(k);
+        const t = order.find(t => t.s === x.s[k] && !t.el.classList.contains('used'));
+        if (t) pulse(t.el);
+        noteBox(`Le morceau suivant, c’est <b class="read">${esc(x.s[k])}</b>.`);
+        return Voice.say(x.s[k]);
+      },
+      reveal() {
+        order.forEach(t => t.el.classList.add('used'));
+        x.s.forEach((s, i) => { const sl = this.slotEls[i]; sl.textContent = s; sl.classList.remove('s-r', 's-b'); sl.classList.add('filled', 'good'); });
+      },
+      after() { return Voice.say(x.w); }
+    };
+  },
+
+  manquante(age) {
+    const lens = age === 6 ? [2] : age === 7 ? [2, 3] : [3, 4];
+    const x = pick(WORDS.filter(w => lens.includes(w.s.length) && new Set(w.s).size === w.s.length));
+    const k = rnd(0, x.s.length - 1), ans = x.s[k];
+    const n = age <= 7 ? 3 : 4;
+    const set = new Set([ans]); let g = 0;
+    while (set.size < n && g++ < 200) {
+      const y = pick(WORDS); if (y.w === x.w) continue;
+      const s = pick(y.s);
+      if (age <= 7 && s[0] === ans[0]) continue;
+      set.add(s);
+    }
+    const opts = shuffle([...set]);
+    return {
+      key: x.w + k,
+      consigne: 'Quelle syllabe manque dans le mot ?',
+      say: `Quelle syllabe manque dans le mot : ${x.w} ?`,
+      answerSay: ans,
+      build(st) {
+        const wd = el('<div class="bigword"></div>');
+        x.s.forEach((s, i) => wd.append(el(i === k ? '<span class="syl gap">?</span>' : `<span class="syl ${i % 2 ? 's-b' : 's-r'}" data-say="${esc(s)}">${esc(s)}</span>`)));
+        this.gap = $('.gap', wd); this.wd = wd;
+        st.append(bigEar(() => Voice.say(x.w)), wd);
+        this.row = optsRow(opts, { correct: ans, cls: 'syls', label: s => `<span class="read">${esc(s)}</span>` });
+        st.append(this.row);
+      },
+      hint() { dropOne(this.row, ans); noteBox('Écoute chaque morceau du mot, un par un.'); return Voice.seq(x.s, 450, { onEach: i => litSyl(this.wd, i) }); },
+      reveal() { markRight(this.row, ans); },
+      onSolved() { this.gap.textContent = ans; this.gap.className = 'syl ' + (k % 2 ? 's-b' : 's-r'); this.gap.dataset.say = ans; },
+      after() { return Voice.say(x.w); }
+    };
+  },
+
+  dictee(age) {
+    const pool = WORDS.filter(w => age === 7 ? (w.s.length <= 2 && w.w.length <= 6) : age === 8 ? (w.s.length >= 2 && w.s.length <= 3 && w.w.length <= 8) : w.s.length >= 3);
+    const x = pick(pool);
+    const L = [...x.w];
+    const tiles = L.map((c, i) => ({ c, id: i }));
+    const extraN = age === 7 ? 2 : 3;
+    for (let e = 0; e < extraN; e++) tiles.push({ c: pick([...'aeioulmnprst']), id: 100 + e });
+    const order = shuffle(tiles);
+    return {
+      key: x.w,
+      consigne: 'Dictée : écris le mot que tu entends avec les lettres.',
+      say: `Écris le mot : ${x.w}.`,
+      answerSay: x.s.join(', ') + '. ' + x.w,
+      build(st) {
+        st.append(bigEar(() => Voice.say(x.w)));
+        const slots = el('<div class="slots letters answers"></div>');
+        const tray = el('<div class="tray letters"></div>');
+        this.filled = L.map(() => null);
+        this.slotEls = L.map((_, i) => {
+          const b = el(`<button class="key slot" aria-label="Lettre ${i + 1}"></button>`);
+          b.onclick = () => this.unplace(i);
+          slots.append(b); return b;
+        });
+        order.forEach(t => {
+          const b = el(`<button class="key stile read">${esc(t.c)}</button>`);
+          b.onclick = () => this.place(t);
+          t.el = b; tray.append(b);
+        });
+        st.append(slots, tray);
+      },
+      place(t) {
+        if (!G || G.locked || t.el.classList.contains('used')) return;
+        const k = this.filled.indexOf(null); if (k < 0) return;
+        this.filled[k] = t; t.el.classList.add('used');
+        const sl = this.slotEls[k]; sl.textContent = t.c; sl.classList.add('filled');
+        if (!this.filled.includes(null)) this.check();
+      },
+      unplace(k) {
+        if (!G || G.locked) return;
+        const t = this.filled[k]; if (!t) return;
+        this.filled[k] = null; t.el.classList.remove('used');
+        const sl = this.slotEls[k]; sl.textContent = ''; sl.classList.remove('filled', 'wrongl');
+      },
+      check() {
+        const ok = this.filled.every((t, i) => t.c === L[i]);
+        if (ok) { this.slotEls.forEach(s => s.classList.add('good')); A.correct(null); return; }
+        this.filled.forEach((t, i) => { if (t.c !== L[i]) { this.slotEls[i].classList.add('wrongl'); shake(this.slotEls[i]); } });
+        A.wrong(null);
+        setTimeout(() => { if (G && !G.locked) this.filled.forEach((t, i) => { if (t && t.c !== L[i]) this.unplace(i); }); }, 1200);
+      },
+      hint() {
+        const k = this.filled.findIndex((t, i) => !t || t.c !== L[i]);
+        if (k < 0) return;
+        for (let i = k; i < this.filled.length; i++) if (this.filled[i] && this.filled[i].c !== L[i]) this.unplace(i);
+        const t = order.find(t => t.c === L[k] && !t.el.classList.contains('used'));
+        if (t) pulse(t.el);
+        noteBox(`Regarde la lettre qui bouge : c’est la lettre n° ${k + 1}. Écoute les syllabes du mot.`);
+        return Voice.seq(x.s.concat([x.w]), 400, { rate: S.rate * 0.85 });
+      },
+      reveal() {
+        order.forEach(t => t.el.classList.add('used'));
+        L.forEach((c, i) => { const sl = this.slotEls[i]; sl.textContent = c; sl.classList.remove('wrongl'); sl.classList.add('filled', 'good'); });
+      },
+      onSolved() { noteBox(`<span class="read big">${sylHTML(x.s)}</span>`, 'explain'); },
+      after() { return Voice.say(x.w); }
+    };
+  },
+
+  phrase(age) {
+    const pool = age === 7 ? PHR.filter(p => p.lv === 1) : age === 8 ? PHR : PHR.filter(p => p.lv === 2).concat(shuffle(PHR.filter(p => p.lv === 1)).slice(0, 5));
+    const p = pick(pool);
+    const opts = shuffle([p.a, ...p.o]);
+    return {
+      key: p.t,
+      consigne: 'Lis la phrase et trouve le mot qui manque. Touche un mot pour l’entendre.',
+      say: 'Lis la phrase et trouve le mot qui manque.',
+      answerSay: p.a,
+      build(st) {
+        st.append(sentenceEl(p.t, '', bl => { this.blank = bl; }));
+        this.row = optsRow(opts, { correct: p.a, cls: 'col', speaker: true, label: w => `<span class="read">${esc(w)}</span>` });
+        st.append(this.row);
+      },
+      hint() { dropOne(this.row, p.a); noteBox('Je te lis la phrase. Quel mot irait bien dans le trou ?'); return Voice.say(p.t.replace('_', ' … hum … ')); },
+      reveal() { markRight(this.row, p.a); },
+      onSolved() { this.blank.textContent = p.a; },
+      after() { return Voice.say(p.t.replace('_', p.a)); }
+    };
+  },
+
+  /* ---------- COMPTER ---------- */
+  compter(age) {
+    const n = age <= 5 ? rnd(1, 10) : rnd(6, 20);
+    const opts = numOpts(n, 3, [1, 2], 1, age <= 5 ? 12 : 22);
+    return {
+      key: 'c' + n,
+      consigne: 'Combien y a-t-il de perles ? Touche-les pour compter.',
+      say: 'Compte les perles. Combien y en a-t-il ? Tu peux toucher les perles pour compter.',
+      answerSay: String(n),
+      build(st) {
+        this.fr = frames([{ n }], { tap: true });
+        this.cnt = 0;
+        this.fr.addEventListener('click', e => {
+          const c = e.target.closest('button.cell');
+          if (!c || c.classList.contains('counted')) return;
+          c.classList.add('counted'); this.cnt++; Voice.say(String(this.cnt));
+        });
+        st.append(this.fr);
+        this.row = optsRow(opts, { correct: n, cls: 'nums' });
+        st.append(this.row);
+      },
+      hint() {
+        noteBox('On compte ensemble, une perle à la fois.');
+        const cells = $$('.cell.on', this.fr);
+        cells.forEach(c => c.classList.remove('counted')); this.cnt = 0;
+        return Voice.seq(cells.map((_, i) => String(i + 1)), 120, { onEach: i => { if (i >= 0) { cells[i].classList.add('counted'); this.cnt = i + 1; } } });
+      },
+      reveal() { markRight(this.row, n); },
+      after: `Il y a ${n} perle${n > 1 ? 's' : ''}.`
+    };
+  },
+
+  nombre(age) {
+    const R = { 5: [0, 10], 6: [0, 30], 7: [10, 99], 8: [100, 999], 9: [1000, 9999] }[age];
+    const n = rnd(R[0], R[1]);
+    const count = age <= 5 ? 3 : 4;
+    const str = String(n), extra = [];
+    if (str.length >= 2) { const rev = Number([...str].reverse().join('')); if (rev !== n && String(rev).length === str.length) extra.push(rev); }
+    if (str.length >= 3) { const a = [...str]; [a[a.length - 1], a[a.length - 2]] = [a[a.length - 2], a[a.length - 1]]; const v = Number(a.join('')); if (v !== n) extra.push(v); }
+    const deltas = age <= 6 ? [1, 2] : age === 7 ? [1, 10] : age === 8 ? [1, 10, 100] : [10, 100, 1000];
+    const opts = numOpts(n, count, deltas, R[0], R[1], extra);
+    return {
+      key: 'n' + n,
+      consigne: 'Écoute et touche le bon nombre.',
+      say: `Trouve le nombre ${n}.`,
+      answerSay: String(n),
+      build(st) {
+        st.append(bigEar(() => Voice.say(String(n))));
+        this.row = optsRow(opts, { correct: n, cls: 'nums' });
+        st.append(this.row);
+      },
+      hint() {
+        dropOne(this.row, n);
+        if (n <= 10) { const h = noteBox('Voici ce nombre en perles :'); h.append(frames([{ n }], { size: 24 })); return Voice.say(String(n)); }
+        noteBox(`${n}, c’est ${decomp(n)}.` + pvTable(n));
+        return Voice.say(`${n}, c'est ${decomp(n)}.`);
+      },
+      reveal() { markRight(this.row, n); },
+      onSolved() { if (n >= 10) noteBox(`<b>${n}</b>` + pvTable(n), 'explain'); },
+      after: (n >= 10 && n < 100) ? `${n}, c'est ${decomp(n)}.` : ''
+    };
+  },
+
+  compare(age) {
+    const big = Math.random() < .5;
+    const cnt = age <= 6 ? 2 : 3;
+    const R = { 5: [1, 10], 6: [1, 20], 7: [10, 99], 8: [100, 999], 9: [1000, 9999] }[age];
+    const base = rnd(R[0], R[1]);
+    const s = new Set([base]); let g = 0;
+    while (s.size < cnt && g++ < 300) {
+      let v;
+      const str = String(base);
+      if (age >= 7 && Math.random() < .65) {
+        const a = [...str];
+        if (Math.random() < .5) { const i = rnd(1, a.length - 1); a[i] = String(rnd(0, 9)); }
+        else { const i = rnd(0, a.length - 2); [a[i], a[i + 1]] = [a[i + 1], a[i]]; }
+        v = Number(a.join(''));
+      } else v = rnd(R[0], R[1]);
+      if (v >= R[0] && v <= R[1]) s.add(v);
+    }
+    while (s.size < cnt) s.add(rnd(R[0], R[1]));
+    const nums = shuffle([...s]);
+    const mx = Math.max(...nums), mn = Math.min(...nums);
+    const ans = big ? mx : mn;
+    const txt = big ? 'Touche le plus grand nombre.' : 'Touche le plus petit nombre.';
+    return {
+      key: nums.join('-') + big,
+      consigne: txt, say: txt, answerSay: String(ans),
+      build(st) {
+        this.row = optsRow(nums, { correct: ans, cls: 'nums', label: v => age <= 5 ? `<span>${v}</span>${frames([{ n: v }], { size: 13 }).outerHTML}` : String(v) });
+        st.append(this.row);
+      },
+      hint() {
+        if (age <= 6) {
+          if (age === 6) $$('.opt', this.row).forEach(b => { if (!$('.frames', b)) b.append(frames([{ n: Number(b.dataset.v) }], { size: 12 })); });
+          const t = big ? 'Le plus grand, c’est celui qui a le plus de perles.' : 'Le plus petit, c’est celui qui a le moins de perles.';
+          noteBox(t); return Voice.say(t);
+        }
+        dropOne(this.row, ans);
+        noteBox('Compare les chiffres de gauche à droite : le premier chiffre compte le plus. S’il est pareil, regarde le suivant.');
+        return Voice.say("Compare d'abord le premier chiffre à gauche. S'il est pareil, regarde le suivant.");
+      },
+      reveal() { markRight(this.row, ans); },
+      onSolved() { if (cnt === 2 && age >= 6) noteBox(`<span class="big">${mx} &gt; ${mn}</span><br>${mx} est plus grand que ${mn}`, 'explain'); },
+      after: cnt === 2 ? `${mx} est plus grand que ${mn}.` : `${ans} est le plus ${big ? 'grand' : 'petit'}.`
+    };
+  },
+
+  suite(age) {
+    let step, M, dir = 1;
+    if (age <= 5) { step = 1; M = 10; }
+    else if (age === 6) { step = pick([1, 1, 2]); M = 20; if (step === 1 && Math.random() < .35) dir = -1; }
+    else if (age === 7) { step = pick([2, 5, 10, 10]); M = 100; if (Math.random() < .25) dir = -1; }
+    else if (age === 8) { step = pick([5, 10, 20, 50, 100]); M = 1000; if (Math.random() < .3) dir = -1; }
+    else { step = pick([3, 4, 25, 50, 100, 1000]); M = step === 1000 ? 10000 : 1000; if (Math.random() < .35) dir = -1; }
+    let s0 = rnd(0, M - 4 * step);
+    if (step >= 5 && Math.random() < .65) s0 = Math.floor(s0 / step) * step;
+    const seq = [0, 1, 2, 3, 4].map(i => s0 + i * step);
+    if (dir < 0) seq.reverse();
+    const k = rnd(1, 4), ans = seq[k];
+    const kp = age >= 7;
+    const rule = `On ${dir > 0 ? 'ajoute' : 'enlève'} ${step} à chaque fois.`;
+    return {
+      key: seq.join(',') + k,
+      consigne: 'Quel nombre manque dans la suite ?',
+      say: 'Quel nombre manque dans la suite ?',
+      answerSay: String(ans),
+      build(st) {
+        const row = el('<div class="seq"></div>');
+        seq.forEach((v, i) => {
+          if (i) row.append(el('<span class="jump" aria-hidden="true"></span>'));
+          const c = el(`<span class="num-c${i === k ? ' blank' : ''}">${i === k ? '?' : v}</span>`);
+          if (i === k) this.blank = c; else c.dataset.say = String(v);
+          row.append(c);
+        });
+        this.seqEl = row; st.append(row);
+        if (kp) this.pad = numPad(st, ans, v => { this.blank.textContent = v === '' ? '?' : v; }, this.blank);
+        else { this.row = optsRow(numOpts(ans, 3, [1, 2, step], 0, M + 2), { correct: ans, cls: 'nums' }); st.append(this.row); }
+      },
+      showJumps() { $$('.jump', this.seqEl).forEach(j => { j.textContent = (dir > 0 ? '+' : '−') + step; }); },
+      hint() { this.showJumps(); if (this.row) dropOne(this.row, ans); noteBox(rule); return Voice.say(rule); },
+      reveal() { if (this.row) markRight(this.row, ans); },
+      onSolved() { this.blank.textContent = ans; this.blank.classList.add('done'); this.blank.dataset.say = String(ans); this.showJumps(); },
+      after() { return Voice.say(seq.join(', ')); }
+    };
+  },
+
+  addition(age) {
+    let a, b;
+    if (age <= 5) { const s = rnd(2, 6); a = rnd(1, s - 1); b = s - a; }
+    else if (age === 6) { const s = rnd(3, 10); a = rnd(1, s - 1); b = s - a; }
+    else if (age === 7) { a = rnd(4, 15); b = rnd(2, Math.min(9, 20 - a)); }
+    else if (age === 8) { a = rnd(12, 78); b = rnd(8, 99 - a); }
+    else { a = rnd(125, 780); b = rnd(46, 999 - a); }
+    return mathQ('+', a, b, age);
+  },
+
+  soustraction(age) {
+    let a, b;
+    if (age <= 5) { a = rnd(2, 6); b = rnd(1, a - 1); }
+    else if (age === 6) { a = rnd(3, 10); b = rnd(1, a - 1); }
+    else if (age === 7) { a = rnd(11, 20); b = rnd(2, Math.min(9, a - 1)); }
+    else if (age === 8) { a = rnd(30, 99); b = rnd(11, a - 8); }
+    else { do { a = rnd(300, 999); } while (digit(a, 1) === 0); b = rnd(101, a - 50); }
+    return mathQ('-', a, b, age);
+  },
+
+  multi(age) {
+    const t = age === 8 ? pick([2, 3, 4, 5, 10]) : rnd(2, 10);
+    const k = age === 8 ? rnd(1, 10) : rnd(2, 10);
+    const ans = t * k;
+    return {
+      key: t + 'x' + k,
+      consigne: 'Calcule la multiplication.',
+      say: `Combien font ${t} fois ${k} ?`,
+      answerSay: String(ans),
+      build(st) {
+        const eq = el(`<div class="eq" aria-label="${t} fois ${k}"><span>${t}</span><span class="op">×</span><span>${k}</span><span class="op">=</span><span class="ansbox">?</span></div>`);
+        this.box = $('.ansbox', eq); st.append(eq);
+        this.pad = numPad(st, ans, v => { this.box.textContent = v === '' ? '?' : v; }, this.box);
+      },
+      hint() {
+        let txt;
+        if (k === 1) txt = `${t} × 1, c’est ${t} une seule fois.`;
+        else if (t <= 5) txt = `${t} × ${k}, c’est ${Array(t).fill(k).join(' + ')}.`;
+        else if (k <= 5) txt = `${t} × ${k}, c’est pareil que ${k} × ${t} : ${Array(k).fill(t).join(' + ')}.`;
+        else txt = `${t} × ${k - 1} = ${t * (k - 1)}. Ajoute encore ${t} !`;
+        const h = noteBox(esc(txt));
+        if (ans <= 40 && t <= 5 && k <= 10) {
+          const gr = el('<div class="groups"></div>');
+          for (let i = 0; i < t; i++) gr.append(frames([{ n: k }], { size: 14 }).firstElementChild);
+          h.append(gr);
+        }
+        return Voice.say(spoken(txt));
+      },
+      reveal() { this.pad.set(ans); },
+      onSolved() { this.box.textContent = ans; this.box.classList.add('ok'); },
+      after: `${t} fois ${k}, égale ${ans}.`
+    };
+  },
+
+  probleme(age) {
+    const [N, gN] = pick(NAMES);
+    let M; do { M = pick(NAMES)[0]; } while (M === N);
+    const o = pick(OBJS);
+    const P = gN === 'f' ? 'Elle' : 'Il', p = gN === 'f' ? 'elle' : 'il';
+    const que = /^[aeiouéèêh]/i.test(M) ? `qu’${M}` : `que ${M}`;
+    const types = age === 7 ? ['add', 'sub'] : age === 8 ? ['add', 'sub', 'cmp', 'mul'] : ['add', 'sub', 'cmp', 'mul', 'div'];
+    const ty = pick(types);
+    const R = age === 7 ? { a: [3, 12], b: [2, 8] } : age === 8 ? { a: [12, 60], b: [5, 30] } : { a: [40, 300], b: [15, 150] };
+    let text, ans, opTxt, opSay, kind;
+    if (ty === 'add') {
+      const a = rnd(...R.a), b = rnd(...R.b); ans = a + b; opTxt = `${a} + ${b}`; opSay = `${a} plus ${b}`; kind = 'une addition';
+      text = `${N} a ${a} ${o}. ${P} en reçoit encore ${b}. Combien de ${o} a-t-${p} maintenant ?`;
+    } else if (ty === 'sub') {
+      const b = rnd(...R.b), a = rnd(b + 2, b + R.a[1]); ans = a - b; opTxt = `${a} − ${b}`; opSay = `${a} moins ${b}`; kind = 'une soustraction';
+      text = `${N} a ${a} ${o}. ${P} en donne ${b} à ${M}. Combien de ${o} lui reste-t-il ?`;
+    } else if (ty === 'cmp') {
+      const b = rnd(...R.b), a = b + rnd(2, R.b[1]); ans = a - b; opTxt = `${a} − ${b}`; opSay = `${a} moins ${b}`; kind = 'une soustraction';
+      text = `${N} a ${a} ${o}. ${M} en a ${b}. Combien de ${o} ${N} a-t-${p} de plus ${que} ?`;
+    } else if (ty === 'mul') {
+      const t = age === 8 ? pick([2, 3, 4, 5, 10]) : rnd(2, 9), k = rnd(2, age === 8 ? 6 : 9);
+      const box = pick([['boîtes', 'boîte'], ['sacs', 'sac'], ['paquets', 'paquet']]);
+      ans = t * k; opTxt = `${k} × ${t}`; opSay = `${k} fois ${t}`; kind = 'une multiplication';
+      text = `Il y a ${k} ${box[0]}. Dans chaque ${box[1]}, il y a ${t} ${o}. Combien y a-t-il de ${o} en tout ?`;
+    } else {
+      const k = rnd(2, 6), t = rnd(2, 9);
+      ans = t; opTxt = `${t * k} : ${k}`; opSay = `${t * k} divisé par ${k}`; kind = 'un partage (une division)';
+      text = `${N} partage ${t * k} ${o} entre ${k} amis. Chacun en reçoit autant. Combien de ${o} reçoit chaque ami ?`;
+    }
+    return {
+      key: text,
+      consigne: 'Écoute ou lis le problème, puis calcule.',
+      say: text,
+      answerSay: `${ans} ${o}`,
+      build(st) {
+        st.append(sentenceEl(text, 'story'));
+        const eq = el(`<div class="eq"><span class="ansbox">?</span><span class="unit">${esc(o)}</span></div>`);
+        this.box = $('.ansbox', eq); st.append(eq);
+        this.pad = numPad(st, ans, v => { this.box.textContent = v === '' ? '?' : v; }, this.box);
+      },
+      hint() {
+        const h = `C’est ${kind} : <b>${opTxt} = ?</b>`;
+        noteBox(h);
+        return Voice.say(`C'est ${kind} : ${opSay}.`);
+      },
+      reveal() { this.pad.set(ans); },
+      onSolved() { this.box.textContent = ans; this.box.classList.add('ok'); noteBox(`${opTxt} = ${ans}`, 'explain'); },
+      after: `${opSay}, égale ${ans}.`
+    };
+  }
+};
+
+/* Additions et soustractions : même moteur */
+function mathQ(op, a, b, age) {
+  const ans = op === '+' ? a + b : a - b;
+  const sym = op === '+' ? '+' : '−', word = op === '+' ? 'plus' : 'moins';
+  const mcq = age <= 6, vertical = age >= 8;
+  return {
+    key: `${a}${op}${b}`,
+    consigne: op === '+' ? 'Calcule l’addition.' : 'Calcule la soustraction.',
+    say: `Combien font ${a} ${word} ${b} ?`,
+    answerSay: String(ans),
+    after: `${a} ${word} ${b}, égale ${ans}.`,
+    build(st) {
+      if (vertical) {
+        this.P = posee(a, b, op, String(ans).length);
+        st.append(this.P.node);
+        this.pad = numPad(st, ans, v => this.P.set(v), this.P.node);
+        return;
+      }
+      const eq = el(`<div class="eq" aria-label="${a} ${word} ${b}"><span>${a}</span><span class="op">${sym}</span><span>${b}</span><span class="op">=</span><span class="ansbox">?</span></div>`);
+      this.box = $('.ansbox', eq); st.append(eq);
+      if (age <= 5) st.append(beadsFor(op, a, b));
+      if (mcq) { this.row = optsRow(numOpts(ans, 3, [1, 2], 0, Math.max(ans + 2, 6)), { correct: ans, cls: 'nums' }); st.append(this.row); }
+      else this.pad = numPad(st, ans, v => { this.box.textContent = v === '' ? '?' : v; }, this.box);
+    },
+    hint(level) {
+      let txt, withBeads = false;
+      const Ta = a - a % 10, Tb = b - b % 10, ua = a % 10, ub = b % 10;
+      if (age <= 7) {
+        withBeads = age >= 6;
+        if (op === '+') txt = (age === 7 && a < 10 && ans > 10) ? `${a} + ${10 - a} = 10, puis 10 + ${ans - 10}.` : `Compte toutes les perles : ${a} jaunes et ${b} bleues.`;
+        else txt = (age === 7 && a > 10 && b > a - 10) ? `${a} − ${a - 10} = 10, puis 10 − ${b - (a - 10)}.` : `Il y a ${a} perles, on en barre ${b}. Compte celles qui restent.`;
+        if (this.row) dropOne(this.row, ans);
+      } else if (age === 8) {
+        if (op === '+') txt = `D’abord les dizaines : ${Ta} + ${Tb} = ${Ta + Tb}. Puis les unités : ${ua} + ${ub} = ${ua + ub}. Ajoute les deux résultats !`;
+        else txt = ub === 0 ? `Enlève ${Tb / 10} dizaines à ${a}.` : `${a} − ${Tb} = ${a - Tb}. Puis enlève encore ${ub}.`;
+      } else {
+        const ncol = String(Math.max(a, b)).length;
+        const col = Math.min((level || 1) - 1, ncol - 1);
+        if (op === '+') {
+          let c = 0;
+          for (let j = 0; j <= col; j++) {
+            const s = digit(a, j) + digit(b, j) + c;
+            if (j === col) txt = `${cap(PLACE[j])} : ${digit(a, j)} + ${digit(b, j)}${c ? ' + 1 (la retenue)' : ''} = ${s}. ` + (s >= 10 ? `J’écris ${s % 10} et je retiens 1.` : `J’écris ${s}.`);
+            c = s >= 10 ? 1 : 0;
+            if (c && this.P) this.P.carry(j + 1, '1');
+          }
+        } else {
+          const da = [0, 1, 2, 3].map(j => digit(a, j)), db = [0, 1, 2, 3].map(j => digit(b, j));
+          for (let j = 0; j <= col; j++) {
+            if (j === col) {
+              const orig = digit(a, j);
+              const pre = da[j] !== orig ? `il reste ${da[j]} (on a échangé), ` : '';
+              txt = da[j] < db[j]
+                ? `${cap(PLACE[j])} : ${pre}${da[j]} − ${db[j]}, on ne peut pas. On échange ${EXCH[j]} : ${da[j] + 10} − ${db[j]} = ${da[j] + 10 - db[j]}.`
+                : `${cap(PLACE[j])} : ${pre}${da[j]} − ${db[j]} = ${da[j] - db[j]}.`;
+            }
+            if (da[j] < db[j]) { da[j] += 10; da[j + 1] -= 1; }
+          }
+        }
+        if (col < ncol - 1) txt += ' Touche encore « Un indice » pour la colonne suivante.';
+      }
+      const h = noteBox(esc(txt));
+      if (withBeads) h.append(beadsFor(op, a, b));
+      return Voice.say(spoken(txt));
+    },
+    reveal() { if (this.row) markRight(this.row, ans); else if (this.pad) this.pad.set(ans); },
+    onSolved() {
+      if (this.box) { this.box.textContent = ans; this.box.classList.add('ok'); }
+      if (this.P) { this.P.set(ans); this.P.node.classList.add('ok'); }
+    }
+  };
+}
+
+/* ================= Moteur de jeu ================= */
+let G = null;
+const A = { correct: e => onCorrect(e), wrong: e => onWrong(e) };
+
+function show(id) {
+  ['home', 'game', 'end', 'words'].forEach(v => { $('#' + v).hidden = v !== id; });
+  window.scrollTo(0, 0);
+}
+function goHome() {
+  if (G) G.token++;
+  Voice.stop();
+  $('#fb').textContent = '';
+  renderHome(); show('home');
+}
+function startGame(id) {
+  if (id === 'mots') { openWords(); return; }
+  const act = ACTS.find(a => a.id === id);
+  G = { act, age: S.age, i: 0, n: S.age <= 5 ? 6 : S.age === 6 ? 8 : 10, results: [], used: new Set(), token: 0 };
+  $('#gTitle').textContent = act.t;
+  show('game');
+  nextQ();
+}
+function nextQ() {
+  const tok = ++G.token;
+  Voice.stop();
+  $('#fb').textContent = '';
+  if (G.i >= G.n) { endGame(); return; }
+  let q, tries = 0;
+  do { q = GEN[G.act.id](G.age); } while (G.used.has(q.key) && ++tries < 30);
+  G.used.add(q.key);
+  Object.assign(G, { q, attempts: 0, hinted: false, hintLevel: 0, locked: false });
+  $('#consigne').textContent = q.consigne;
+  const st = $('#stage'); st.innerHTML = '';
+  q.build(st);
+  updateBeads();
+  window.scrollTo(0, 0);
+  if (S.auto && tok === G.token) sayConsigne();
+}
+function sayConsigne() { if (G && G.q) return Voice.say(G.q.say); }
+function updateBeads() {
+  const b = $('#beads'); b.innerHTML = '';
+  for (let k = 0; k < G.n; k++) {
+    const r = G.results[k];
+    const d = document.createElement('span');
+    d.className = 'bead' + (r ? ' ' + r : '') + (!r && k === G.results.length ? ' cur' : '');
+    b.append(d);
+  }
+}
+async function onCorrect(elm) {
+  if (!G || G.locked) return;
+  G.locked = true; const tok = G.token;
+  if (elm) elm.classList.add('good');
+  sfx('good');
+  G.results.push(G.attempts === 0 && !G.hinted ? 'star' : 'ok');
+  updateBeads();
+  let msg = pick(PRAISE);
+  if (S.name && Math.random() < .3) msg = msg.replace(/ !$/, ` ${S.name} !`);
+  fb(msg, 'good');
+  if (G.q.onSolved) G.q.onSolved();
+  await Voice.say(msg);
+  if (tok !== G.token) return;
+  const af = G.q.after;
+  if (af) { await (typeof af === 'function' ? G.q.after() : Voice.say(af)); if (tok !== G.token) return; }
+  await wait(450);
+  if (tok !== G.token) return;
+  G.i++; nextQ();
+}
+async function onWrong(elm) {
+  if (!G || G.locked) return;
+  const tok = G.token;
+  G.attempts++;
+  sfx('bad');
+  if (elm) { shake(elm); if (elm.classList.contains('opt')) elm.disabled = true; }
+  if (G.attempts >= 3) {
+    G.locked = true;
+    G.results.push('miss'); updateBeads();
+    if (G.q.reveal) G.q.reveal();
+    if (G.q.onSolved) G.q.onSolved();
+    fb('Voici la bonne réponse', 'info');
+    const cont = el('<button class="key cont">Continuer</button>');
+    cont.onclick = () => { if (tok === G.token) { G.i++; nextQ(); } };
+    $('#stage').append(cont);
+    await Voice.say(`Ce n'est pas grave. La bonne réponse est : ${G.q.answerSay}.`);
+    if (tok === G.token) cont.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    return;
+  }
+  const m = pick(OOPS);
+  fb(m, 'bad');
+  await Voice.say(m);
+  if (tok !== G.token || G.locked) return;
+  if (G.attempts === 2) doHint();
+}
+function doHint() {
+  if (!G || G.locked || !G.q.hint) return;
+  G.hinted = true; G.hintLevel++;
+  G.q.hint(G.hintLevel);
+  const n = $('#stage .note'); if (n) n.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+function endGame() {
+  const first = G.results.filter(r => r === 'star').length;
+  const ratio = first / G.n;
+  const stars = ratio >= .9 ? 3 : ratio >= .6 ? 2 : 1;
+  S.stars += stars;
+  S.best[G.act.id] = Math.max(S.best[G.act.id] || 0, stars);
+  save();
+  const title = stars === 3 ? 'Bravo' : stars === 2 ? 'Très bien' : 'Bien joué';
+  const t = `${title}${S.name ? ' ' + S.name : ''} !`;
+  $('#endT').textContent = t;
+  $('#endStars').innerHTML = [0, 1, 2].map(i => `<span class="${i < stars ? 'on' : ''}">★</span>`).join('');
+  const msg = first === 0
+    ? `Tu as travaillé avec les indices. On recommence pour gagner plus d’étoiles ?`
+    : `Tu as trouvé ${plural(first, 'réponse', 'réponses')} du premier coup sur ${G.n}. Tu gagnes ${plural(stars, 'étoile', 'étoiles')} !`;
+  $('#endMsg').textContent = msg;
+  show('end');
+  sfx('star');
+  Voice.say(`${t} Tu gagnes ${plural(stars, 'étoile', 'étoiles')} !`);
+}
+
+/* ================= Accueil ================= */
+function renderHome() {
+  $('#starCount').textContent = S.stars;
+  const hello = S.name ? `Bonjour ${S.name} ! À quoi on joue ?` : 'Bonjour ! À quoi on joue ?';
+  const h = $('#hello'); h.textContent = hello; h.dataset.say = hello;
+  $$('#ages .age').forEach(b => b.setAttribute('aria-checked', String(Number(b.dataset.age) === S.age)));
+  $$('.subj').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.subj === S.subj)));
+  const grid = $('#grid'); grid.innerHTML = '';
+  ACTS.filter(a => a.subj === S.subj && S.age >= a.min && S.age <= a.max).forEach(a => {
+    const best = S.best[a.id] || 0;
+    const starsHTML = a.id === 'mots' ? '' : '★'.repeat(best) + `<span class="off">${'★'.repeat(3 - best)}</span>`;
+    const b = el(`<button class="key tile" style="--c:var(${a.subj === 'lire' ? '--red' : '--blue'})">
+      <span class="tile-ico read" aria-hidden="true">${a.ico}</span>
+      <span class="tile-t">${a.t}</span>
+      <span class="tile-d">${a.d}</span>
+      <span class="tile-s" aria-label="${a.id === 'mots' ? '' : best + ' étoiles sur 3'}">${starsHTML}</span>
+    </button>`);
+    b.onclick = () => startGame(a.id);
+    grid.append(b);
+  });
+}
+function buildAges() {
+  const box = $('#ages');
+  [5, 6, 7, 8, 9].forEach(n => {
+    const b = el(`<button class="key age" role="radio" aria-checked="false">${n} ans</button>`);
+    b.dataset.age = n;
+    b.onclick = () => { S.age = n; save(); renderHome(); Voice.say(`${n} ans`); };
+    box.append(b);
+  });
+}
+
+/* ================= Boîte à mots ================= */
+const WV = { tab: 2, cur: null };
+function openWords() {
+  show('words');
+  renderWordTabs();
+  if (!WV.cur) setReader(pick(WORDS.filter(w => w.s.length === 2)));
+}
+function renderWordTabs() {
+  const tabs = $('#wtabs'); tabs.innerHTML = '';
+  [1, 2, 3, 4].forEach(n => {
+    const b = el(`<button class="key wtab" role="tab" aria-selected="${n === WV.tab}">${n} syllabe${n > 1 ? 's' : ''}</button>`);
+    b.onclick = () => { WV.tab = n; renderWordTabs(); };
+    tabs.append(b);
+  });
+  const list = $('#wlist'); list.innerHTML = '';
+  WORDS.filter(w => w.s.length === WV.tab).forEach(w => {
+    const b = el(`<button class="key wchip">${sylHTML(w.s, { tap: false })}</button>`);
+    b.onclick = () => { setReader(w); Voice.say(w.w); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+    list.append(b);
+  });
+}
+function setReader(x) {
+  WV.cur = x;
+  const r = $('#rword');
+  if (x.s.length === 1 && x.s[0] === x.w && !WORDS.includes(x)) { r.textContent = x.w; r.classList.add('read'); }
+  else r.innerHTML = sylHTML(x.s);
+}
+function readFree() {
+  const t = $('#freeTxt').value.trim();
+  if (!t) { $('#freeTxt').focus(); return; }
+  const found = WORDS.find(w => w.w === t.toLowerCase());
+  setReader(found || { w: t, s: [t] });
+  Voice.say(t);
+}
+
+/* ================= Réglages ================= */
+function updateVoiceNote() {
+  const n = document.getElementById('voiceNote'); if (!n) return;
+  if (!Voice.ok) n.textContent = "Ce navigateur ne sait pas lire à voix haute. Essaie avec Chrome ou Safari.";
+  else if (!Voice.v) n.textContent = "Aucune voix française trouvée pour l'instant. Si la voix ne parle pas français, installe la voix française dans les réglages de synthèse vocale de l'appareil.";
+  else n.textContent = `Voix utilisée : ${Voice.v.name}.`;
+}
+function syncSettings() {
+  $('#setName').value = S.name;
+  $$('#setRate .key').forEach(b => b.setAttribute('aria-pressed', String(Number(b.dataset.r) === S.rate)));
+  $('#setAuto').checked = S.auto;
+  $('#setSfx').checked = S.sfx;
+  updateVoiceNote();
+}
+function closeSettings() {
+  S.name = $('#setName').value.trim().slice(0, 20);
+  save(); renderHome();
+  const d = $('#settings');
+  if (d.open) { if (d.close) d.close(); else d.removeAttribute('open'); }
+}
+
+/* ================= Démarrage ================= */
+function init() {
+  buildAges();
+  Voice.init();
+
+  $$('[data-home]').forEach(b => { b.onclick = goHome; });
+  $$('.subj').forEach(b => { b.onclick = () => { S.subj = b.dataset.subj; save(); renderHome(); Voice.say(S.subj === 'lire' ? 'Lire' : 'Compter'); }; });
+  $('#starsPill').onclick = () => Voice.say(`Tu as ${plural(S.stars, 'étoile', 'étoiles')} !`);
+
+  $('#spk').onclick = sayConsigne;
+  $('#btnListen').onclick = sayConsigne;
+  $('#btnHint').onclick = doHint;
+  $('#again').onclick = () => startGame(G.act.id);
+
+  $('#rSay').onclick = () => { if (WV.cur) Voice.say(WV.cur.w); };
+  $('#rSlow').onclick = () => {
+    if (!WV.cur) return;
+    if (WV.cur.s.length > 1) Voice.seq(WV.cur.s.concat([WV.cur.w]), 380, { onEach: i => litSyl($('#rword'), i), rate: S.rate * 0.85 });
+    else Voice.say(WV.cur.w, { rate: 0.6 });
+  };
+  $('#freeSay').onclick = readFree;
+  $('#freeTxt').addEventListener('keydown', e => { if (e.key === 'Enter') readFree(); });
+
+  const dlg = $('#settings');
+  $('#openSettings').onclick = () => { syncSettings(); if (dlg.showModal) dlg.showModal(); else dlg.setAttribute('open', ''); };
+  $('#closeSettings').onclick = closeSettings;
+  dlg.addEventListener('cancel', () => { S.name = $('#setName').value.trim().slice(0, 20); save(); renderHome(); });
+  $$('#setRate .key').forEach(b => { b.onclick = () => { S.rate = Number(b.dataset.r); save(); syncSettings(); Voice.say('Bonjour ! Je parle à cette vitesse.'); }; });
+  $('#setAuto').onchange = e => { S.auto = e.target.checked; save(); };
+  $('#setSfx').onchange = e => { S.sfx = e.target.checked; save(); if (S.sfx) sfx('good'); };
+  $('#testVoice').onclick = () => Voice.say(S.name ? `Bonjour ${S.name} ! On va bien s'amuser.` : "Bonjour ! On va bien s'amuser.");
+  let armed = false;
+  $('#resetStars').onclick = e => {
+    const b = e.currentTarget;
+    if (!armed) { armed = true; b.textContent = 'Toucher encore pour confirmer'; setTimeout(() => { armed = false; b.textContent = 'Remettre les étoiles à zéro'; }, 3000); return; }
+    armed = false; S.stars = 0; S.best = {}; save(); renderHome(); b.textContent = 'Étoiles remises à zéro';
+  };
+
+  /* Toucher un mot ou une syllabe pour l'entendre */
+  document.addEventListener('click', e => {
+    const t = e.target.closest('[data-say]');
+    if (!t || t.closest('.opt')) return;
+    Voice.say(t.dataset.say);
+    if (t.classList.contains('syl') || t.classList.contains('w')) { t.classList.add('lit'); setTimeout(() => t.classList.remove('lit'), 500); }
+  });
+  /* Clavier physique (ordinateur) */
+  document.addEventListener('keydown', e => {
+    if ($('#game').hidden) return;
+    const pad = $('#stage .pad'); if (!pad) return;
+    let k = null;
+    if (/^[0-9]$/.test(e.key)) k = `[aria-label="${e.key}"]`;
+    else if (e.key === 'Backspace') k = '.del';
+    else if (e.key === 'Enter') k = '.ok';
+    if (k) { const b = $(k, pad); if (b) { e.preventDefault(); b.click(); } }
+  });
+  document.addEventListener('pointerdown', unlockAudio, { once: true });
+  $$('.vretry').forEach(b => { b.onclick = () => { Voice.worked = false; Voice.say('Bonjour ! Tu m’entends ?'); }; });
+  if (!Voice.ok) voiceProblem();
+
+  renderHome();
+  show('home');
+}
+init();
+</script>
+</body>
+</html>
